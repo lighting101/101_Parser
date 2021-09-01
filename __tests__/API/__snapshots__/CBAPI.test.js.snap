@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getResume() The method apiQuery() calling Check arguments of apiQuery() ...packet (to match snapshot) 1`] = `
+"
+            <Packet>
+                <SessionToken>ddafb0de1ce845c5a4cce9db8fb716d8-683658211-CS-4</SessionToken>
+                <ResumeID>R2Z6X65W0GSJ0WS3C44</ResumeID>
+                <CustAcctCode>CA101</CustAcctCode>
+                <GetWordDocIfAvailable>False</GetWordDocIfAvailable>
+            </Packet>"
+`;
+
+exports[`getResume() if success if got a good CV format 1`] = `
+Object {
+  "city": "Atlanta",
+  "email": "csolomon_homes@yahoo.com",
+  "name": "Collin Solomon",
+  "state": "GA",
+}
+`;
+
+exports[`getResumeList() The method apiQuery() calling Check arguments of apiQuery() ...packet 1`] = `
+"
+        <Packet>
+            <SessionToken>ddafb0de1ce845c5a4cce9db8fb716d8-683658211-CS-4</SessionToken>
+            <Keywords>driver OR cashier</Keywords>
+            <City>Atlanta</City>
+            <State>GA</State>
+            <FreshnessInDays>10</FreshnessInDays>
+            <RemoveDuplicates>True</RemoveDuplicates>
+            <OrderBy>-MODIFIEDINT</OrderBy>
+            <PageNumber>1</PageNumber>
+            <RowsPerPage>10</RowsPerPage>
+        </Packet>"
+`;
+
+exports[`getResumeList() if success to match a snapshot 1`] = `
+Object {
+  "maxPage": 45,
+  "page": 1,
+  "resumes": Array [
+    "RCM21S71GP8GHG6ZFJZ",
+    "RD85NS6L588R28B6MRL",
+    "RD77YZ6WHX5CPSVBMTM",
+    "RCM48K62Q80CDHHPSW3",
+    "RD72ZC6LR31MF69KR86",
+    "RDH54467TMSC4TF3ZQL",
+    "R2N0TM6TK76083X3L5F",
+    "R2Z1JL6YB8XGVFG1KYM",
+    "RDF5MM6MSLD3TF2D067",
+    "RCM8HZ68FJSJS1VCW67",
+  ],
+}
+`;
+
+exports[`openSession() method The method apiQuery() calling Check arguments of apiQuery() ...packet 1`] = `"<Packet><Email>test@msn.com</Email><Password>12345</Password></Packet>"`;
