@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`setDisableAccount() Params for db.query() must be to match snapshot 1`] = `
+Array [
+  "update \`accounts\` set \`status\` = 0 where \`id\` = ?",
+  Array [
+    123,
+  ],
+]
+`;

@@ -89,6 +89,13 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         return resumeListingResult;
     }
 
+    protected moveAccToEnd(i:number):void {
+        const account = this.accounts[i];
+
+        this.accounts.splice(i, 1);
+        this.accounts.push(account);
+    }
+
     async getAccount(): Promise<IAccount> {
         if (this.accounts.length === 0) {
             const errorMsg = 'Accounts list is empty'
@@ -99,10 +106,7 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         for (let i = 0, l = this.accounts.length; i < l; i++) {
             const account = this.accounts[i];
             if (account.canProcess()) {
-
-                this.accounts.splice(i, 1);
-                this.accounts.push(account);
-
+                this.moveAccToEnd(i);
                 return account;
             }
         }

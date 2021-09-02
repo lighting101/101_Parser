@@ -240,17 +240,22 @@ describe('getResume()', () => {
                 }
             };
 
-            const someError = new Error('Some error');
+            const error = new Error('Some error');
 
             pool.getAccount = jest.fn(() => Promise.resolve(account));
 
             // @ts-ignore
-            pool.CBAPI.getResume = jest.fn(() => Promise.reject(someError));
+            pool.CBAPI.getResume = jest.fn()
+                .mockRejectedValue(error);
+
+            // @ts-ignore
+            pool.errorHandler = jest.fn()
+                .mockRejectedValue(error);
 
             try {
                 await pool.getResume(task);
             } catch (e) {
-                expect(e).toMatchObject(someError);
+                expect(e).toMatchObject(error);
             }
         })
     })
@@ -434,7 +439,12 @@ describe('getResumeList()', () => {
             pool.getAccount = jest.fn(() => Promise.resolve(account));
 
             // @ts-ignore
-            pool.CBAPI.getResumeList = jest.fn(() => Promise.reject(someError));
+            pool.CBAPI.getResumeList = jest.fn()
+                .mockRejectedValue(someError);
+
+            // @ts-ignore
+            pool.errorHandler = jest.fn()
+                .mockRejectedValue(someError);
 
             try {
                 await pool.getResumeList(task);
@@ -506,34 +516,299 @@ describe('saveAccounts()', () => {
         const accountsLength = 30;
 
         const accounts = []
-        for (let i = 0; i < accountsLength; i++) {
-            const account = new Account(<AccountBuilder>{});
-
-            // @ts-ignore
-            account.getSession = jest.fn(() => Promise.resolve(generate(20)));
-
-            // @ts-ignore
-            account.getCustAccCode = jest.fn(() => generate(7));
-
-            // @ts-ignore
-            account.getProxy = jest.fn(() => Promise.resolve("http://1.1.1.1:1080"));
-
-            // @ts-ignore
-            account.getID = jest.fn(() => genId());
-
-            accounts.push(account);
-        }
-
-        // @ts-ignore
-        pool.db.query = jest.fn();
+        for (let i = 0; i < accountsLength; i++)
+            accounts.push(new Account(<AccountBuilder>{}));
 
         // @ts-ignore
         pool.accounts = accounts;
 
         // @ts-ignore
-        await pool.saveAccounts();
+        const saveAccount = pool.saveAccount = jest.fn();
 
         // @ts-ignore
-        expect(pool.db.query.mock.calls.length).toBe(accounts.length);
+        await pool.saveAccounts();
+
+        expect(saveAccount.mock.calls.length).toBe(accounts.length);
+    })
+})
+
+describe('saveAccount()', () => {
+    it('SQL query must be contains account\'s data', async () => {
+        expect.assertions(4);
+
+        const pool = new CBAccountPoolDB();
+        const account = new Account(<AccountBuilder>{});
+
+        const cac = generate(7);
+        const session = generate(20);
+        const proxy = "http://1.1.1.1:1080";
+        const id = genId();
+
+        // @ts-ignore
+        account.getSession = jest.fn().mockResolvedValue(session);
+
+        // @ts-ignore
+        account.getCustAccCode = jest.fn().mockReturnValue(cac);
+
+        // @ts-ignore
+        account.getProxy = jest.fn().mockResolvedValue(proxy);
+
+        // @ts-ignore
+        account.getID = jest.fn().mockReturnValue(id);
+
+        // @ts-ignore
+        pool.db.query = jest.fn();
+
+        // @ts-ignore
+        await pool.saveAccount(account);
+
+        // db.query(sql, [ {session, cac, proxy}, id ])
+
+        // @ts-ignore
+        const sqlParams = pool.db.query.mock.calls[0][1];
+
+        expect(sqlParams[0].session).toBe(session);
+        expect(sqlParams[0].cac).toBe(cac);
+        expect(sqlParams[0].proxy).toBe(proxy);
+        expect(sqlParams[1]).toBe(id);
+    })
+})
+
+describe('errorHandler()', () => {
+    it('Unhandled error must throwing up the exception', async () => {
+        expect.assertions(1);
+
+        const pool = new CBAccountPoolDB();
+        const account = new Account(<AccountBuilder> {});
+
+        const someError = new Error('Unhandled exception');
+
+        // @ts-ignore
+        pool.passwordInvalid = jest.fn();
+
+        // @ts-ignore
+        pool.removeInactiveAccount = jest.fn();
+
+        // @ts-ignore
+        account.accountInactive = jest.fn()
+            .mockReturnValue(false);
+
+        const recursiveCallback = jest.fn();
+
+        try {
+            // @ts-ignore
+            await pool.errorHandler(someError, account, async () => await recursiveCallback());
+        } catch (e) {
+            expect(e).toMatchObject(someError);
+        }
+    })
+
+    it('The unhandled error & the inactive account are calling removeInactiveAccount()', async () => {
+        expect.assertions(1);
+
+        const pool = new CBAccountPoolDB();
+        const account = new Account(<AccountBuilder> {});
+
+        const someError = new Error('Unhandled exception');
+
+        // @ts-ignore
+        pool.passwordInvalid = jest.fn();
+
+        // @ts-ignore
+        const removeInactiveAccount = pool.removeInactiveAccount = jest.fn();
+
+        // @ts-ignore
+        account.accountInactive = jest.fn()
+            .mockReturnValue(true);
+
+        const recursiveCallback = jest.fn();
+
+        try {
+            // @ts-ignore
+            await pool.errorHandler(someError, account, async () => await recursiveCallback());
+        } catch {
+            expect(removeInactiveAccount.mock.calls.length).toBe(1);
+        }
+    })
+
+    describe('If got an exception like "Incorrect password"', () => {
+        it('The exception handling and isn\'t throwing up', async () => {
+            expect.assertions(1);
+
+            const pool = new CBAccountPoolDB();
+            const account = new Account(<AccountBuilder> {});
+
+            const errIncorrectPassword = new Error('{"Code":["300"],"Text":["300|Email test@mail.com and/or Password could not be validated."]}');
+
+            // @ts-ignore
+            pool.passwordInvalid = jest.fn();
+
+            // @ts-ignore
+            pool.removeInactiveAccount = jest.fn();
+
+            // @ts-ignore
+            account.accountInactive = jest.fn()
+                .mockReturnValue(false);
+
+            const testData = { someKey: 'Test Data' };
+            const recursiveCallback = jest.fn()
+                .mockResolvedValue(testData);
+
+            // @ts-ignore
+            const result = await pool.errorHandler(errIncorrectPassword, account, async () => await recursiveCallback());
+
+            expect(result).toBe(testData);
+        })
+
+        it('Must be run the recursive callback', async () => {
+            expect.assertions(1);
+
+            const pool = new CBAccountPoolDB();
+            const account = new Account(<AccountBuilder> {});
+
+            const errIncorrectPassword = new Error('{"Code":["300"],"Text":["300|Email test@mail.com and/or Password could not be validated."]}');
+
+            // @ts-ignore
+            pool.passwordInvalid = jest.fn();
+
+            // @ts-ignore
+            pool.removeInactiveAccount = jest.fn();
+
+            // @ts-ignore
+            account.accountInactive = jest.fn()
+                .mockReturnValue(false);
+
+            const recursiveCallback = jest.fn();
+
+            try {
+                // @ts-ignore
+                await pool.errorHandler(errIncorrectPassword, account, async () => await recursiveCallback());
+            } finally {
+                expect(recursiveCallback.mock.calls.length).toBe(1);
+            }
+        })
+
+        it('Must be run the passwordInvalid() method', async () => {
+            expect.assertions(1);
+
+            const pool = new CBAccountPoolDB();
+            const account = new Account(<AccountBuilder> {});
+
+            const errIncorrectPassword = new Error('{"Code":["300"],"Text":["300|Email test@mail.com and/or Password could not be validated."]}');
+
+            // @ts-ignore
+            const passwordInvalid = pool.passwordInvalid = jest.fn();
+
+            // @ts-ignore
+            pool.removeInactiveAccount = jest.fn();
+
+            // @ts-ignore
+            account.accountInactive = jest.fn()
+                .mockReturnValue(false);
+
+            const recursiveCallback = jest.fn();
+
+            try {
+                // @ts-ignore
+                await pool.errorHandler(errIncorrectPassword, account, async () => await recursiveCallback());
+            } finally {
+                expect(passwordInvalid.mock.calls.length).toBe(1);
+            }
+        })
+    })
+})
+
+describe('setDisableAccount()', () => {
+    it('Params for db.query() must be to match snapshot', async () => {
+        expect.assertions(1);
+
+        const account = new Account(<AccountBuilder> {});
+        const pool = new CBAccountPoolDB();
+
+        account.getID = jest.fn().mockReturnValue(123);
+
+        // @ts-ignore
+        pool.db.query = jest.fn();
+
+        // @ts-ignore
+        await pool.setDisableAccount(account);
+
+        // @ts-ignore
+        expect(pool.db.query.mock.calls[0]).toMatchSnapshot();
+    })
+})
+
+describe('getAccount()', () => {
+    it('Throwing a specific exception if accounts pool is empty', async () => {
+        expect.assertions(1);
+
+        const pool = new CBAccountPoolDB();
+
+        try {
+            await pool.getAccount();
+        } catch (e) {
+            expect(e.message).toMatch('Accounts list is empty');
+        }
+    })
+
+    it('Waiting for the account, if one will be in processing for 3 seconds', async () => {
+        expect.assertions(1);
+
+        const canAccountProcess = {status: false};
+
+        setTimeout(() => canAccountProcess.status = true, 3000);
+
+        const pool = new CBAccountPoolDB();
+
+        const account = new Account(<AccountBuilder>{});
+
+        const canProcess = account.canProcess = jest.fn(() => canAccountProcess.status);
+
+        // @ts-ignore
+        pool.moveAccToEnd = jest.fn();
+
+        // @ts-ignore
+        pool.accounts.push(account);
+
+        await pool.getAccount();
+
+        expect(canProcess.mock.calls.length).toBeGreaterThanOrEqual(2);
+    })
+
+    it('Got an account from the pool', async () => {
+        expect.assertions(1);
+
+        const pool = new CBAccountPoolDB();
+        const account = new Account(<AccountBuilder>{});
+
+        account.canProcess = jest.fn().mockReturnValue(true);
+
+        // @ts-ignore
+        pool.moveAccToEnd = jest.fn();
+
+        // @ts-ignore
+        pool.accounts.push(account);
+
+        const resultAccount = await pool.getAccount();
+
+        expect(resultAccount).toMatchObject(account);
+    })
+
+    it('Calling the moveAccToEnd() method', async () => {
+        expect.assertions(1);
+
+        const pool = new CBAccountPoolDB();
+        const account = new Account(<AccountBuilder>{});
+        account.canProcess = jest.fn().mockReturnValue(true);
+
+        // @ts-ignore
+        const moveAccToEnd = pool.moveAccToEnd = jest.fn();
+
+        // @ts-ignore
+        pool.accounts.push(account);
+
+        await pool.getAccount();
+
+        expect(moveAccToEnd.mock.calls.length).toBe(1);
     })
 })
