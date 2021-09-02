@@ -8,5 +8,6 @@ import {JoberFormat} from "../../../common"
 export default interface IProvider {
     beforeWork():Promise<void>
     afterWork():Promise<void>
+    getName():string
     go(gotResume:(resume:JoberFormat) => Promise<void>):Promise<void>
 }

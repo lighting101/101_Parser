@@ -12,12 +12,17 @@ export default class ProviderCB implements IProvider
 {
     private tasks:ITasks;
     private accountPool:ICBAccountPool;
+    protected name = 'CareerBuilder';
 
     constructor(taskProvider:ITasks = new Tasks(),
                 accountPool:ICBAccountPool = new CBAccountPoolDB()) {
 
         this.tasks = taskProvider;
         this.accountPool = accountPool;
+    }
+
+    getName():string {
+        return this.name;
     }
 
     async beforeWork(): Promise<void> {

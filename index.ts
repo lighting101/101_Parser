@@ -13,19 +13,20 @@ const parsers:IProvider[] = []
 parsers.push(new ProviderCB())
 
 const promises:Promise<void>[] = parsers.map(async parser => {
-    await log.debug('parser.beforeWork() start');
+    const parserName = parser.getName();
+    await log.debug(`parser[${parserName}].beforeWork() start`);
     await parser.beforeWork();
-    await log.debug('parser.beforeWork() finish');
+    await log.debug(`parser[${parserName}].beforeWork() finish`);
     try {
-        await log.debug('parser.go() start');
+        await log.debug(`parser[${parserName}].go() start`);
         await parser.go(async resume => await resumeDB.save(resume));
-        await log.debug('parser.go() finish');
+        await log.debug(`parser[${parserName}].go() finish`);
     } catch (e) {
-        await log.error(e.message);
+        await log.error(`parser[${parserName}] caught error ${e.name}: ${e.message}`);
     } finally {
-        await log.debug('parser.afterWork() start');
+        await log.debug(`parser[${parserName}].afterWork() start`);
         await parser.afterWork();
-        await log.debug('parser.afterWork() finish');
+        await log.debug(`parser[${parserName}].afterWork() finish`);
     }
 })
 
