@@ -135,9 +135,6 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         }
     }
 
-    /*
-    TODO: Отключение аккаунтов с неверным логином и паролем #обработка_ошибок_работы_c_API
-     */
     protected async setDisableAccount(account:IAccount):Promise<void> {
         const sql = 'update `accounts` set `status` = 0 where `id` = ?';
         await this.db.query(sql, [ account.getID() ]);
@@ -145,7 +142,6 @@ export default class CBAccountPoolDB implements ICBAccountPool {
 
     /*
     TODO: Удаление из очереди аккаунтов с исчерпанным лимитом парсинга
-    TODO: Удаление из очереди аккаунтов с неверным логином и паролем #обработка_ошибок_работы_c_API
     TODO: Удаление из очереди аккаунтов с превышенным лимитом ошибок #обработка_ошибок_работы_c_API
      */
     protected removeAccount(targetAccount:IAccount):void {
