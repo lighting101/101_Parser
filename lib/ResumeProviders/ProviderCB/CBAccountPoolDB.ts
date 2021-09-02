@@ -31,21 +31,42 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         this.db = new Database();
     }
 
+    protected async passwordInvalid(account:IAccount):Promise<void> {
+        await this.setDisableAccount(account);
+        this.removeAccount(account);
+    }
+
+    protected async removeInactiveAccount(account:IAccount):Promise<void> {
+        await this.saveAccount(account);
+        this.removeAccount(account);
+    }
+
+    protected async errorHandler(e:Error, account:IAccount, recursion?:() => Promise<any>):Promise<any> {
+        if (/Password could not be validated/i.test(e.message)) {
+            await this.passwordInvalid(account);
+            if (typeof recursion !== 'undefined') {
+                return await recursion();
+            }
+        } else {
+            if (account.accountInactive()) {
+                await this.removeInactiveAccount(account);
+            }
+            throw e;
+        }
+    }
+
     async getResume(task:TaskFormat): Promise<JoberFormat> {
         const account = await this.getAccount();
 
-        let resume:JoberFormat;
+        let resume;
         try {
             resume = await this.CBAPI.getResume(task, account);
         } catch (e) {
-            if (/Password could not be validated/i.test(e.message)) {
-                await this.setDisableAccount(account);
-                this.removeAccount(account);
+            resume = <JoberFormat> await this.errorHandler(e, account, async () => await this.getResume(task));
+        }
 
-                return await this.getResume(task);
-            } else {
-                throw e;
-            }
+        if (account.accountInactive()) {
+            await this.removeInactiveAccount(account);
         }
 
         return resume;
@@ -58,14 +79,11 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         try {
             resumeListingResult = await this.CBAPI.getResumeList(task, account);
         } catch (e) {
-            if (/Password could not be validated/i.test(e.message)) {
-                await this.setDisableAccount(account);
-                this.removeAccount(account);
+            resumeListingResult = <{page:number, maxPage:number, resumes:string[]}> await this.errorHandler(e, account, async () => await this.getResumeList(task));
+        }
 
-                return await this.getResumeList(task);
-            } else {
-                throw e;
-            }
+        if (account.accountInactive()) {
+            await this.removeInactiveAccount(account);
         }
 
         return resumeListingResult;
@@ -140,10 +158,6 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         await this.db.query(sql, [ account.getID() ]);
     }
 
-    /*
-    TODO: Удаление из очереди аккаунтов с исчерпанным лимитом парсинга
-    TODO: Удаление из очереди аккаунтов с превышенным лимитом ошибок #обработка_ошибок_работы_c_API
-     */
     protected removeAccount(targetAccount:IAccount):void {
         for (let i = 0, l = this.accounts.length; i < l; i++) {
             const account = this.accounts[i];
@@ -153,19 +167,23 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         }
     }
 
+    protected async saveAccount(account:IAccount):Promise<void> {
+        const params = [
+            {
+                session: await account.getSession(true),
+                cac: account.getCustAccCode(),
+                proxy: await account.getProxy()
+            },
+            account.getID()
+        ];
+
+        await this.db.query('update ' +
+            '`accounts` set ? where `id` = ?', params);
+    }
+
     protected async saveAccounts():Promise<void> {
         for (const account of this.accounts) {
-            const params = [
-                {
-                    session: await account.getSession(true),
-                    cac: account.getCustAccCode(),
-                    proxy: await account.getProxy()
-                },
-                account.getID()
-            ];
-
-            await this.db.query('update ' +
-                '`accounts` set ? where `id` = ?', params);
+            await this.saveAccount(account);
         }
     }
 

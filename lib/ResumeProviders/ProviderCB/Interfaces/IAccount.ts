@@ -9,5 +9,5 @@ export default interface IAccount
     canProcess():boolean
     successProcessed(resumeParsed?:boolean):void
     getCustAccCode():string
-    accountDisabled():boolean
+    accountInactive():boolean
 }

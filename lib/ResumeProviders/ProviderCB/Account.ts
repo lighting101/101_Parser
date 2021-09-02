@@ -88,14 +88,14 @@ export default class Account implements IAccount
 
     gotError(e:Error):number {
         const errorStr = `[${this.getLogin()}] ${e.name}: ${e.message}`;
-        this.log.error(errorStr);
+        this.log.error(errorStr).then();
 
         this.stopProcess();
 
         return ++this.errorsCount;
     }
 
-    accountDisabled():boolean {
+    accountInactive():boolean {
         if (this.passwordInvalid) return true;
         if (this.errorsCount >= MAX_ERRORS_ACCOUNT) return true;
         if (this.parseLimit <= 0) return true;
@@ -104,7 +104,7 @@ export default class Account implements IAccount
     }
 
     canProcess():boolean {
-        return !(this.processing || this.accountDisabled());
+        return !(this.processing || this.accountInactive());
     }
 
     protected startProcess():void {
