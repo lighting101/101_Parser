@@ -154,9 +154,7 @@ export default class CBAPI implements ICBAPI {
         const resumeIDs:Array<string> = [];
 
         for (const rawResume of resumeListing) {
-            if (isArray(rawResume.ResumeID)
-                && rawResume.ResumeID.length > 0
-                && typeof rawResume.ResumeID === 'string') {
+            if (isArray(rawResume.ResumeID) && rawResume.ResumeID.length > 0) {
 
                 resumeIDs.push(rawResume.ResumeID[0])
             }
