@@ -812,3 +812,28 @@ describe('getAccount()', () => {
         expect(moveAccToEnd.mock.calls.length).toBe(1);
     })
 })
+
+describe('moveAccToEnd()', () => {
+    it('Specified index of an account object in the pool must be moved to the end of the pool', async () => {
+        expect.assertions(1);
+
+        // @ts-ignore
+        const account1 = <Account> {key: 'account 1'};
+
+        // @ts-ignore
+        const account2 = <Account> {key: 'account 2'};
+
+        // @ts-ignore
+        const account3 = <Account> {key: 'account 3'};
+
+        const pool = new CBAccountPoolDB();
+
+        // @ts-ignore
+        const accounts = pool.accounts = [ account1, account2, account3 ];
+
+        // @ts-ignore
+        pool.moveAccToEnd(0);
+
+        expect(accounts[ accounts.length - 1 ]).toMatchObject(account1);
+    })
+})
