@@ -15,7 +15,7 @@ interface JoberFormat {
     name: string,
     state: string,
     city: string,
-    account_id?: number // TODO Проверить, чтоб использовалось как account_id а не jobber_id !!!
+    account_id?: number
 }
 
 interface TaskDataBranch {

@@ -1,3 +1,7 @@
+/*
+* Отвечает за связь списка задач с классом хранилища
+* */
+
 import {TaskFormat} from "../../../common";
 import TasksStorageDB from "./TasksStorageDB";
 import ITasksStorage from "./Interfaces/ITaskStorage";
