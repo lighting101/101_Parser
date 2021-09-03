@@ -1,24 +1,41 @@
 import IProvider from "./Interfaces/IProvider"
-import {JoberFormat} from "../../common"
+import {JoberFormat, TaskFormat} from "../../common"
 import Log from "../LogDB"
 import Tasks from "./ProviderCB/Tasks"
 import ITasks from "./ProviderCB/Interfaces/ITasks";
 import CBAccountPoolDB from "./ProviderCB/CBAccountPoolDB";
 import ICBAccountPool from "./ProviderCB/Interfaces/ICBAccountPool";
-
-const log = new Log('ProviderCB')
+import ILog from "../Interfaces/ILog";
 
 export default class ProviderCB implements IProvider
 {
+    private resumes = new Set<JoberFormat>();
     private tasks:ITasks;
+    private log:ILog;
     private accountPool:ICBAccountPool;
     protected name = 'CareerBuilder';
 
     constructor(taskProvider:ITasks = new Tasks(),
-                accountPool:ICBAccountPool = new CBAccountPoolDB()) {
+                accountPool:ICBAccountPool = new CBAccountPoolDB(),
+                log = new Log('ProviderCB')) {
 
         this.tasks = taskProvider;
         this.accountPool = accountPool;
+        this.log = log;
+    }
+
+    protected clearResumes():void {
+        this.resumes.clear();
+    }
+
+    getResumes():JoberFormat[] {
+        const resumes = [ ...this.resumes ];
+        this.clearResumes();
+        return resumes;
+    }
+
+    protected addResume(resume:JoberFormat):void {
+        this.resumes.add(resume);
     }
 
     getName():string {
@@ -33,46 +50,56 @@ export default class ProviderCB implements IProvider
         await this.accountPool.afterWork();
     }
 
-    async go(gotResume:(resume:JoberFormat) => Promise<void>):Promise<void> {
-        await log.debug('go() started');
-        const tasks = await this.tasks.getTasks();
+    protected async branchTaskHandler(task:TaskFormat):Promise<void> {
+        if (task.data.kind !== 'branch')
+            throw new Error(`branchTaskHandler() Error the task type: ${JSON.stringify(task)}`);
 
-        for (const task of tasks) {
-            if (task.data.kind === 'branch') {
-                await log.debug('go() the task is a branch')
+        const {page, maxPage, resumes} = await this.accountPool.getResumeList(task);
 
-                const {page, maxPage, resumes} = await this.accountPool.getResumeList(task);
+        await this.tasks.putTasksResumes(resumes);
 
-                await this.tasks.putTasksResumes(resumes);
-
-                if (page === 1 && maxPage > 1) {
-                    for (let i = 2, l = maxPage; i <= l; i++) {
-                        await this.tasks.putTasksListing(task.data.city, task.data.state, i);
-                    }
-                }
-
-            } else if (task.data.kind === 'resume') {
-                await log.debug('go() the task is a resume')
-
-                let resumeData
-                try {
-                    resumeData = await this.accountPool.getResume(task);
-                } catch (e) {
-                    if (/Accounts list is empty/.test(e.message)) {
-                        // TODO error: Accounts list is empty
-                    } else {
-                        throw e;
-                    }
-                }
-
-                if (resumeData !== null) {
-                    await log.debug(`go() got new resume = ${resumeData}`)
-                    // @ts-ignore
-                    await gotResume(resumeData);
-                }
-            } else throw new Error('Undefined parse type');
+        if (page === 1 && maxPage > 1) {
+            for (let i = 2, l = maxPage; i <= l; i++) {
+                await this.tasks.putTasksListing(task.data.city, task.data.state, i);
+            }
         }
+    }
 
-        await log.debug('go() finished');
+    protected async resumeTaskHandler(task:TaskFormat):Promise<void> {
+        if (task.data.kind !== 'resume')
+            throw new Error(`resumeTaskHandler() Error the task type: ${JSON.stringify(task)}`);
+
+        const resumeData = await this.accountPool.getResume(task);
+        await this.log.debug(`go() got new resume = ${resumeData}`)
+        this.addResume(resumeData);
+    }
+
+    protected async taskProcessor(task:TaskFormat):Promise<void> {
+        if (task.data.kind === 'branch') {
+            await this.branchTaskHandler(task);
+        } else if (task.data.kind === 'resume') {
+            await this.resumeTaskHandler(task);
+        } else throw new Error('Undefined parse task type');
+    }
+
+    async go():Promise<void> {
+        await this.log.debug('go() started');
+
+        const tasks = await this.tasks.getTasks();
+        await Promise.all(tasks.map(async task => {
+            try {
+                await this.taskProcessor(task);
+            } catch (e) {
+                // TODO Отловить возможные ошибки
+                if (/Accounts list is empty/i.test(e.message)) {
+                    await this.log.debug('Not enough alive accounts');
+                } else {
+                    await this.log.error(`go() ${e.name}: ${e.message}`);
+                    throw e;
+                }
+            }
+        }));
+
+        await this.log.debug('go() finished');
     }
 }
