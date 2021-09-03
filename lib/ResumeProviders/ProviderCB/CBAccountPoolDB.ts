@@ -122,16 +122,16 @@ export default class CBAccountPoolDB implements ICBAccountPool {
             '    `pass`, ' +
             '    `proxy`, ' +
             '    `session`, ' +
-            '    `cac` ' +
+            '    `cac`, ' +
             '    @a:=(select count(*) as `cnt` ' +
             '        from `events` as `e` ' +
             '        where ' +
-            '            `e`.`type`=\'resume_parsed\' ' +
+            '            `e`.`type`=\'resume_parse\' ' +
             '        and ' +
             '            `e`.`account_id`=`acc`.`id` ' +
             '        and ' +
             '            `e`.`ts` > date_sub(now(), interval 1 day) ' +
-            '        group by `e`.`account_id`) `parsed`, ' +
+            '        group by `e`.`account_id`) as `parsed`, ' +
             '    @b:=`daylimit` as `daylimit`, ' +
             '    if(@a is null, @b, @b-@a) as `remainder` ' +
             'from `accounts` as `acc` ' +
