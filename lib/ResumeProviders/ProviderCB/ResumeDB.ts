@@ -11,8 +11,14 @@ const db = new Database();
 export default class ResumeDB implements IResume
 {
     async save(resume: JoberFormat): Promise<void> {
-        await log.info(`Saving a resume ${JSON.stringify(resume)}`)
+        await log.debug(`Saving a resume ${JSON.stringify(resume)}`)
         const sql = 'insert ignore into jobers set ?';
         await db.query(sql, [ resume ]);
+    }
+
+    async saveMany(resumeList:JoberFormat[]):Promise<void> {
+        for (const resume of resumeList) {
+            await this.save(resume);
+        }
     }
 }

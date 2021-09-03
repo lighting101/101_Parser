@@ -19,13 +19,19 @@ const promises:Promise<void>[] = parsers.map(async parser => {
     await log.debug(`parser[${parserName}].beforeWork() finish`);
     try {
         await log.debug(`parser[${parserName}].go() start`);
-        await parser.go(async resume => await resumeDB.save(resume));
+        await parser.go();
         await log.debug(`parser[${parserName}].go() finish`);
     } catch (e) {
         await log.error(`parser[${parserName}] caught error ${e.name}: ${e.message}`);
     } finally {
         await log.debug(`parser[${parserName}].afterWork() start`);
+
+        const resumes = parser.getResumes();
+        await log.debug(`parser[${parserName}].afterWork() finally found ${resumes.length} resumes`);
+        await resumeDB.saveMany(resumes);
+
         await parser.afterWork();
+
         await log.debug(`parser[${parserName}].afterWork() finish`);
     }
 })
