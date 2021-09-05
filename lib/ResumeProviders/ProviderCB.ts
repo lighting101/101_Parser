@@ -82,6 +82,15 @@ export default class ProviderCB implements IProvider
         } else throw new Error('Undefined parse task type');
     }
 
+    protected async goErrorHandler(e:Error):Promise<void> {
+        if (/Accounts list is empty/i.test(e.message)) {
+            await this.log.debug('Not enough alive accounts');
+        } else {
+            await this.log.error(`go() ${e.name}: ${e.message}`);
+            throw e;
+        }
+    }
+
     async go():Promise<void> {
         await this.log.debug('go() started');
 
@@ -91,12 +100,7 @@ export default class ProviderCB implements IProvider
                 await this.taskProcessor(task);
             } catch (e) {
                 // TODO Отловить возможные ошибки
-                if (/Accounts list is empty/i.test(e.message)) {
-                    await this.log.debug('Not enough alive accounts');
-                } else {
-                    await this.log.error(`go() ${e.name}: ${e.message}`);
-                    throw e;
-                }
+               await this.goErrorHandler(e);
             }
         }));
 
