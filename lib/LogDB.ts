@@ -21,6 +21,7 @@ export default class LogDB implements ILog {
     private config:LogDBConfig;
     private db:Database;
     private moduleName:string;
+    protected errorLevelText = ['debug', 'info', 'error'];
 
     constructor(moduleName = '', config:LogDBConfig = defaultConfig) {
         this.db = new Database();
@@ -43,6 +44,10 @@ export default class LogDB implements ILog {
         await this.drawMessage(msg, level);
     }
 
+    protected level2Text(level:number):string {
+        return this.errorLevelText[level];
+    }
+
     private async drawMessage(message:string, level:number) {
         if (level >= this.config.Console) {
             console.log(message);
@@ -50,7 +55,7 @@ export default class LogDB implements ILog {
 
         if (level >= this.config.Database) {
             const sql = 'insert into `log` set ?'
-            await this.db.query(sql, [{ message, level }])
+            await this.db.query(sql, [{ message, level: this.level2Text(level) }])
         }
     }
 }
