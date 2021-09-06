@@ -1,14 +1,5 @@
-import {TaskType} from "./common";
-
-type EmptyCallback = () => void;
-
-interface FullError {
-    code?: number|string,
-    message?: string
-}
-
-type CBError = FullError | null;
-type CBFunction = (err?:CBError, param1?:any, param2?:any, param3?:any) => void;
+// Типы задач
+export type TaskType = 'resume' | 'branch';
 
 interface JoberFormat {
     email: string,
@@ -34,32 +25,3 @@ interface TaskDataResume {
 }
 
 interface TaskFormat {data: TaskDataBranch | TaskDataResume, id?: number}
-
-interface ResumeFormat_HomeLocation {
-    City: string[],
-    State: string[],
-}
-
-interface ResumeFormat {
-    ResumeID: string,
-    ContactEmail: string[],
-    HomeLocation: ResumeFormat_HomeLocation[],
-    ContactName: string[],
-    Error?: string[],
-}
-
-interface CBAccount {
-    id:number,
-    login:string,
-    pass:string,
-    daylimit:number,
-    proxy:string
-}
-
-interface DataBaseConfig {
-    host: string,
-    user: string,
-    password: string,
-    database: string,
-    getTasksLimit?: number
-}
