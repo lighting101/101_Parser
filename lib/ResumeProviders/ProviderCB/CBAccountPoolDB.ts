@@ -3,7 +3,7 @@ import IAccount from "./Interfaces/IAccount";
 import Database from "../../Database";
 import LogDB from "../../LogDB";
 import ILog from "../../Interfaces/ILog";
-import {DEFAULT_PARSE_LIMIT, maxThreads} from "../../../config";
+import {DEFAULT_PARSE_LIMIT} from "../../../config";
 import AccountBuilder from "./AccountBuilder";
 import { TaskFormat, JoberFormat } from "../../../common";
 import CBAPI from "./CBAPI";
@@ -17,17 +17,13 @@ export default class CBAccountPoolDB implements ICBAccountPool {
     protected db:Database;
     protected accounts: Array<IAccount> = [];
     private log: ILog;
-    private threads = 0; // TODO Limit threads!
-    private maxThreads: number;
     private CBAPI:ICBAPI;
 
     constructor(logProvider: ILog = new LogDB('CBAccountPool'),
-                CBAPIProvider:ICBAPI = new CBAPI(),
-                optionMaxThreads = maxThreads) {
+                CBAPIProvider:ICBAPI = new CBAPI()) {
 
         this.log = logProvider;
         this.CBAPI = CBAPIProvider;
-        this.maxThreads = optionMaxThreads;
         this.db = new Database();
     }
 

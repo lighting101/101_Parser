@@ -29,6 +29,17 @@ export const ROWS_PER_PAGE = +process.env.ROWS_PER_PAGE || 400;
 // @ts-ignore
 export const maxThreads = +process.env.MAX_THREADS || 10;
 
+// Максимальное время, которое аккаунт находится в работе. Если что-то подвиснет
+// и до этого времени аккаунт не сменит статус с занят на свободен, то сброс
+// произойдёт принудительно
+// @ts-ignore
+export const maxTimeLimitForAccount = (+process.env.MAX_TIMELIMIT_ACCOUNT || 5) * 60 * 1000;
+
+// Если взяли задачу в обработку и парсер упал,
+// через сколько часов можно взять ее в обработку повторно?
+// @ts-ignore
+export const maxHoursTaskCanProcessing = +process.env.MAX_HOURS_TASK_PROCESSING || 1;
+
 /* -- ProxyPoolFineproxy -- */
 export const fineproxy = {
     login: process.env.FINEPROXY_LOGIN || '',

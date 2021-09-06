@@ -5,6 +5,7 @@ import ILog from "../../Interfaces/ILog";
 import CBAPI from "./CBAPI";
 import ProxyPoolFineproxy from "../../ProxyPoolFineproxy";
 import LogDB from "../../LogDB";
+import {maxTimeLimitForAccount} from "../../../config";
 
 export default class AccountBuilder
 {
@@ -21,7 +22,7 @@ export default class AccountBuilder
     timeToResetProcessingStatus:number;
 
     constructor() {
-        this.timeToResetProcessingStatus = 1000 * 60 * 5;
+        this.timeToResetProcessingStatus = maxTimeLimitForAccount;
         this.cac = 'CA' + Math.round(Math.random() * 1000).toString();
     }
 

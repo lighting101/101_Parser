@@ -54,7 +54,17 @@ export default class ProviderCB implements IProvider
         if (task.data.kind !== 'branch')
             throw new Error(`branchTaskHandler() Error the task type: ${JSON.stringify(task)}`);
 
-        const {page, maxPage, resumes} = await this.accountPool.getResumeList(task);
+        let page:number, maxPage:number, resumes:string[];
+
+        try {
+            const result = await this.accountPool.getResumeList(task);
+            page = result.page;
+            maxPage = result.maxPage;
+            resumes = result.resumes;
+        } catch (e) {
+            await this.tasks.putTasksListing(task.data.city, task.data.state, task.data.page);
+            throw e;
+        }
 
         await this.tasks.putTasksResumes(resumes);
 
@@ -69,9 +79,18 @@ export default class ProviderCB implements IProvider
         if (task.data.kind !== 'resume')
             throw new Error(`resumeTaskHandler() Error the task type: ${JSON.stringify(task)}`);
 
-        const resumeData = await this.accountPool.getResume(task);
-        await this.log.debug(`go() got new resume = ${resumeData}`)
+
+        let resumeData:JoberFormat;
+
+        try {
+            resumeData = await this.accountPool.getResume(task);
+        } catch (e) {
+            await this.tasks.putTasksResumes([ task.data.resumeID ]);
+            throw e;
+        }
+
         this.addResume(resumeData);
+        await this.log.debug(`resumeTaskHandler() got new resume = ${resumeData}`);
     }
 
     protected async taskProcessor(task:TaskFormat):Promise<void> {
@@ -80,6 +99,8 @@ export default class ProviderCB implements IProvider
         } else if (task.data.kind === 'resume') {
             await this.resumeTaskHandler(task);
         } else throw new Error('Undefined parse task type');
+
+        await this.tasks.markDone(task);
     }
 
     protected async goErrorHandler(e:Error):Promise<void> {
@@ -99,7 +120,6 @@ export default class ProviderCB implements IProvider
             try {
                 await this.taskProcessor(task);
             } catch (e) {
-                // TODO Отловить возможные ошибки
                await this.goErrorHandler(e);
             }
         }));

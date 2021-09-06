@@ -1,15 +1,15 @@
 import {TaskFormat} from "../../../common";
 import Database from "../../Database";
-import {TASKS_LIMIT} from "../../../config";
+import {TASKS_LIMIT, maxHoursTaskCanProcessing} from "../../../config";
 import ITasksStorage from "./Interfaces/ITaskStorage";
-import {TaskType} from "../../../commons";
+import {TaskType} from "../../../common";
 import LogDB from "../../LogDB";
 import ILog from "../../Interfaces/ILog";
-
 const db = new Database();
 
 type TasksDB = {
-    type: number,
+    id: number,
+    type: string,
     data: string,
     controlhash: string
 };
@@ -22,61 +22,40 @@ export default class TasksStorageDB implements ITasksStorage
         this.log = logProvider;
     }
 
-    async clearOldTasks():Promise<void> {
-        const sql = 'delete from `tasks` where `status` <> 3 or `type` <> 3';
-        await db.query(sql);
-    }
-
-    async resetStatus():Promise<void> {
-        const sql = 'update `tasks` set `status` = 1 where `status` = 2';
-        await db.query(sql);
-    }
-
-    async doneTasks(tasks: Array<TaskFormat>): Promise<void> {
-        const sql = 'update `tasks` set `status` = 3 where `id` in (?)';
-
-        const taskIDs:Array<number> = [];
-        for (const task of tasks) {
-            if (typeof task.id !== 'undefined') {
-                taskIDs.push(task.id);
-            }
-        }
-
-        await db.query(sql, [ taskIDs ]);
+    async markDone(task: TaskFormat): Promise<void> {
+        const sql = 'update `tasks` set `done` = 1 where `id` = ?';
+        await db.query(sql, [ task.id ]);
     }
 
     async getTasks(): Promise<TaskFormat[]> {
-        let tasks:Array<{ type: number, data: string, id: number}>;
-
-        await this.resetStatus();
+        let tasks:TasksDB[];
 
         await db.beginTransaction();
 
         // get tasks with status = 1 (waiting for process)
         const sql1 = 'SELECT `id`, `type`, `data` ' +
             'FROM `tasks` ' +
-            'WHERE `status` = 1 ' +
-            'order by `type` desc, `ts` asc ' +
+            'WHERE `done` = 0 and `processing` > date_sub(now(), interval ? hour) ' +
+            'order by `type` asc, `ts` asc ' +
             'limit ?';
 
-        const sql2 = 'update `tasks` set `status` = 2 where `id` in (?)';
-
         try {
-            tasks = await db.query(sql1, [ TASKS_LIMIT ]);
-
-            if (tasks.length === 0) {
-                throw new Error('No any tasks in DB');
-            }
-
-            // make status "processing"
-            const taskIDs = tasks.map(task => task.id)
-            await db.query(sql2, [ taskIDs ]);
-
-            await db.commit();
+            tasks = await db.query(sql1, [ maxHoursTaskCanProcessing, TASKS_LIMIT ]);
         } catch (e) {
             await db.rollback();
             throw e;
         }
+
+        if (tasks.length === 0) {
+            throw new Error('No any tasks in DB');
+        }
+
+        const sql2 = 'update `tasks` set `processing` = unix_timestamp() where `id` in (?)';
+
+        const taskIDs = tasks.map(task => task.id)
+        await db.query(sql2, [ taskIDs ]);
+
+        await db.commit();
 
         const returnTasks:TaskFormat[] = [];
 
@@ -96,17 +75,15 @@ export default class TasksStorageDB implements ITasksStorage
 
             const id = <number> task.id;
 
-            // Checking to have a kind field in the data
+            // Does have a "kind" field in the data?
             if (!('kind' in data)) {
-                if (type === TaskType.TASK_BRANCH_PARSE) {
-                    data.kind = 'branch';
-                } else if (type === TaskType.TASK_RESUME_PARSE) {
-                    data.kind = 'resume';
-                } else {
+                if (!(type === 'branch' || type === 'resume')) {
                     const errMsg = 'getTasks() got undefined task type';
                     await this.log.error(errMsg);
                     throw new Error(errMsg);
                 }
+
+                data.kind = type;
             }
 
             // Checking to have other needing fields in the data to according with the Task format
@@ -130,31 +107,26 @@ export default class TasksStorageDB implements ITasksStorage
         return returnTasks;
     }
 
-    async putTasks(tasks: Array<TaskFormat>): Promise<void> {
-        const sql = 'insert ignore into `tasks` (`type`, `data`, `controlhash`) values ?';
+    async putTask(task: TaskFormat): Promise<void> {
+        const sql = 'insert ignore into `tasks` set ?';
+        const type = task.data.kind;
 
-        const tasksChecked:TasksDB[] = [];
-        for (const task of tasks) {
-            let type:TaskType;
-
-            if (task.data.kind === 'resume') {
-                type = TaskType.TASK_RESUME_PARSE;
-            } else if (task.data.kind === 'branch') {
-                type = TaskType.TASK_BRANCH_PARSE;
-            } else {
-                const errorMsg = 'Undefined kind field in the task';
-                await this.log.error(errorMsg);
-                throw new Error(errorMsg);
-            }
-
-            tasksChecked.push({
-                type,
-                data: JSON.stringify(task.data),
-                controlhash: 'md5(data)'
-            });
+        if (!(type === 'resume' || type === 'branch')) {
+            const errorMsg = 'Undefined kind field in the task';
+            await this.log.error(errorMsg);
+            throw new Error(errorMsg);
         }
 
-        await db.query(sql, [ tasksChecked ]);
+        await db.query(sql, [{
+            type,
+            data: JSON.stringify(task.data),
+            controlhash: 'md5(data)'
+        }]);
     }
 
+    async putTasks(tasks: Array<TaskFormat>): Promise<void> {
+        for (const task of tasks) {
+            await this.putTask(task);
+        }
+    }
 }

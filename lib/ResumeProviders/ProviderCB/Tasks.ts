@@ -33,6 +33,10 @@ export default class Tasks implements ITasks {
         this.keywords = JSON.parse(fs.readFileSync("./json/keywords.json").toString()).join(' OR ');
     }
 
+    markDone(task: TaskFormat): Promise<void> {
+        return this.storage.markDone(task);
+    }
+
     async getTasks(): Promise<TaskFormat[]> {
         let tasks: TaskFormat[] = [];
 
