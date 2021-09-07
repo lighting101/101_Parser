@@ -2,7 +2,7 @@ import ProviderCB from "../../lib/ResumeProviders/ProviderCB";
 import Tasks from "../../lib/ResumeProviders/ProviderCB/Tasks";
 import CBAccountPoolDB from "../../lib/ResumeProviders/ProviderCB/CBAccountPoolDB";
 import LogDB from "../../lib/LogDB";
-import {TaskFormat} from "../../common";
+import {JoberFormat, TaskFormat} from "../../common";
 
 jest.mock("../../lib/ResumeProviders/ProviderCB/Tasks");
 jest.mock("../../lib/ResumeProviders/ProviderCB/CBAccountPoolDB");
@@ -225,7 +225,110 @@ describe('taskProcessor()', () => {
 })
 
 describe('resumeTaskHandler()', () => {
+    it('throw an exception if task.data.kind !== \'resume\'', async () => {
+        expect.assertions(1);
 
+        const task:TaskFormat = {
+            data: {
+                kind: 'branch',
+                keywords: 'driver OR cashier',
+                city: 'Atlanta',
+                state: 'GA',
+                freshness: 10,
+                page: 1,
+                rowsPerPage: 10
+            }
+        };
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        try {
+            // @ts-ignore
+            await provCB.resumeTaskHandler(task);
+        } catch (e) {
+            expect(e.message).toContain('Error the task type');
+        }
+    })
+
+    it('launch the addResume() method with found data', async () => {
+        expect.assertions(2);
+
+        const task:TaskFormat = {
+            data: {
+                kind: 'resume',
+                resumeID: 'R0000000001'
+            }
+        };
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        const testJober = {
+            email: 'test@msn.com',
+            name: 'John Malkovich',
+            city: 'Miami',
+            state: 'FL',
+        };
+
+        // @ts-ignore
+        provCB.accountPool.getResume = jest.fn(() => Promise.resolve(testJober))
+
+        // @ts-ignore
+        const addResume = provCB.addResume = jest.fn();
+
+        // @ts-ignore
+        await provCB.resumeTaskHandler(task);
+
+        expect(addResume).toHaveBeenLastCalledWith(testJober);
+        expect(addResume).toHaveBeenCalledTimes(1);
+    })
+
+    it('if this.accountPool.getResume() throws an exception, then must be launched putTasksResumes() method with the task data', async () => {
+        expect.assertions(2);
+
+        const task:TaskFormat = {
+            data: {
+                kind: 'resume',
+                resumeID: 'R0000000001'
+            }
+        };
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        const testJober = {
+            email: 'test@msn.com',
+            name: 'John Malkovich',
+            city: 'Miami',
+            state: 'FL',
+        };
+
+        // @ts-ignore
+        provCB.accountPool.getResume = jest.fn()
+            .mockRejectedValue(new Error('Some error'))
+
+        // @ts-ignore
+        const putTasksResumes = provCB.tasks.putTasksResumes = jest.fn();
+
+        try {
+            // @ts-ignore
+            await provCB.resumeTaskHandler(task);
+        } catch {
+            // handler...
+        } finally {
+            expect(putTasksResumes).toHaveBeenCalledTimes(1);
+
+            // @ts-ignore
+            expect(putTasksResumes).toHaveBeenLastCalledWith([ task.data.resumeID ]);
+        }
+    })
 })
 
 describe('branchTaskHandler()', () => {
