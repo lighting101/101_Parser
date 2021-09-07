@@ -27,11 +27,65 @@ describe('go()', () => {
         provCB.tasks.getTasks = jest.fn().mockResolvedValue(tasks);
 
         // @ts-ignore
-        const taskProcessor = provCB.taskProcessor = jest.fn(task => Promise.resolve(task));
+        const taskProcessor = provCB.taskProcessor = jest.fn();
 
         await provCB.go();
 
-        expect(taskProcessor.mock.calls.map(args => args[0])).toMatchObject(tasks);
+        expect(taskProcessor).toHaveBeenCalledTimes(tasks.length);
+    })
+
+    it('Even if the taskProcessor() throws an exception work doesn\'t stop', async () => {
+        expect.assertions(1);
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        const tasks = [ 'task1', 'task2', 'task3' ]
+
+        // @ts-ignore
+        provCB.tasks.getTasks = jest.fn().mockResolvedValue(tasks);
+
+        // @ts-ignore
+        const taskProcessor = provCB.taskProcessor = jest.fn();
+
+        // @ts-ignore
+        provCB.goErrorHandler = jest.fn();
+
+        taskProcessor.mockRejectedValueOnce(new Error('Some error 1'))
+        taskProcessor.mockRejectedValueOnce(new Error('Some error 2'))
+
+        await provCB.go();
+
+        expect(1).toBe(1);
+    })
+
+    it('If the taskProcessor() throws an error, must be called goErrorHandler()', async () => {
+        expect.assertions(1);
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        const tasks = [ 'task1', 'task2', 'task3' ]
+
+        // @ts-ignore
+        provCB.tasks.getTasks = jest.fn().mockResolvedValue(tasks);
+
+        // @ts-ignore
+        const taskProcessor = provCB.taskProcessor = jest.fn();
+
+        // @ts-ignore
+        const goErrorHandler = provCB.goErrorHandler = jest.fn();
+
+        taskProcessor.mockRejectedValueOnce(new Error('Some error 1'))
+        taskProcessor.mockRejectedValueOnce(new Error('Some error 2'))
+
+        await provCB.go();
+
+        expect(goErrorHandler).toHaveBeenCalledTimes(2);
     })
 })
 
