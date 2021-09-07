@@ -626,3 +626,39 @@ describe('getResumes()', () => {
 
     })
 })
+
+describe('goErrorHandler()', () => {
+    it('do not throw an exception if no accounts', async() => {
+        expect.assertions(1);
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        const error = new Error('Accounts list is empty');
+
+        // @ts-ignore
+        await provCB.goErrorHandler(error);
+
+        expect(1).toBe(1);
+    })
+
+    it('throw an exception if the error is undefined', async () => {
+        expect.assertions(1);
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        const error = new Error('Some undefined error');
+
+        try {
+            // @ts-ignore
+            await provCB.goErrorHandler(error);
+        } catch {
+            expect(1).toBe(1);
+        }
+    })
+})

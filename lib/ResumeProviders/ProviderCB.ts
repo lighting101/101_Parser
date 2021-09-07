@@ -79,7 +79,6 @@ export default class ProviderCB implements IProvider
         if (task.data.kind !== 'resume')
             throw new Error(`resumeTaskHandler() Error the task type: ${JSON.stringify(task)}`);
 
-
         let resumeData:JoberFormat;
 
         try {
