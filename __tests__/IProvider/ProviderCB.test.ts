@@ -401,4 +401,35 @@ describe('getResumes()', () => {
 
         expect(clearResumes.mock.calls.length).toBe(1);
     })
+
+    it('Must be returns this.resumes Set as Array', async () => {
+        expect.assertions(4);
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        // @ts-ignore
+        provCB.resumes = new Set<JoberFormat>([
+            'R000000000001',
+            'R000000000002',
+            'R000000000003',
+            'R000000000004',
+            'R000000000005',
+            'R000000000006',
+            'R000000000007'
+        ])
+
+        // @ts-ignore
+        provCB.clearResumes = jest.fn();
+
+        const result = provCB.getResumes();
+
+        expect(Array.isArray(result)).toBe(true)
+        expect(result.length).toBe(7)
+        expect(result[0]).toBe('R000000000001')
+        expect(result[6]).toBe('R000000000007')
+
+    })
 })
