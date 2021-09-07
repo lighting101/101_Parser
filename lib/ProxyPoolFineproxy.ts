@@ -37,10 +37,14 @@ export default class ProxyPoolFineproxy implements IProxyPool
         return this.updated + this.updateTimer < currentTimestamp;
     }
 
-    private async loadProxies():Promise<void> {
+    private async makeRequest():Promise<string> {
         const apiurl = `https://account.fineproxy.org/api/getproxy/?format=txt&type=httpip&login=${this.login}&password=${this.pass}`;
         const response = await fetch(apiurl);
-        const txtList = await response.text();
+        return await response.text();
+    }
+
+    private async loadProxies():Promise<void> {
+        const txtList = await this.makeRequest();
 
         this.cleanList();
         this.refreshUpdated();
