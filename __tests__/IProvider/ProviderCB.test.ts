@@ -36,6 +36,42 @@ describe('go()', () => {
 })
 
 describe('taskProcessor()', () => {
+    it('In the end, must be run this.tasks.markDone() method', async () => {
+        expect.assertions(2);
+
+        const provCB = new ProviderCB(
+            new Tasks(),
+            new CBAccountPoolDB(),
+            new LogDB());
+
+        const task:TaskFormat = {
+            data: {
+                kind: 'branch',
+                keywords: 'driver OR cashier',
+                city: 'Atlanta',
+                state: 'GA',
+                freshness: 10,
+                page: 1,
+                rowsPerPage: 10
+            }
+        };
+
+        // @ts-ignore
+        provCB.branchTaskHandler = jest.fn();
+
+        // @ts-ignore
+        provCB.resumeTaskHandler = jest.fn();
+
+        // @ts-ignore
+        const markDone = provCB.tasks.markDone = jest.fn();
+
+        // @ts-ignore
+        await provCB.taskProcessor(task);
+
+        expect(markDone).toHaveBeenCalledTimes(1);
+        expect(markDone).toHaveBeenLastCalledWith(task);
+    })
+
     describe('If type of the task is branch', () => {
         it('Must be launch the branchTaskHandler(task) method', async () => {
             expect.assertions(1);
