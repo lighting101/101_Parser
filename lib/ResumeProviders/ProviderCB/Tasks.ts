@@ -51,14 +51,20 @@ export default class Tasks implements ITasks {
             tasks = await this.storage.getTasks();
         } catch (e) {
             if (e.message === 'No any tasks in DB') {
-                tasks = this.rootTasks();
+                const newTasks = this.rootTasks();
+                await this.storage.putTasks(newTasks);
             } else {
                 throw e;
             }
         }
 
-        await this.log.debug(`getTasks() found ${tasks.length} tasks`);
-        return tasks;
+        if (!tasks.length) {
+            await this.log.info(`getTasks() no any tasks, start recursion!`);
+            return await this.getTasks();
+        } else {
+            await this.log.debug(`getTasks() found ${tasks.length} tasks`);
+            return tasks;
+        }
     }
 
     rootTasks(): Array<TaskFormat> {

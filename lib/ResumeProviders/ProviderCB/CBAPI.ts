@@ -29,27 +29,18 @@ export default class CBAPI implements ICBAPI {
     async openSession(account:IAccount):Promise<string> {
         const packet = `<Packet><Email>${account.getLogin()}</Email><Password>${account.getPassword()}</Password></Packet>`;
 
-        let result;
-        try {
-            result = await this.apiQuery('BeginSessionV2', packet, await account.getProxy());
-        } catch (e) {
-            account.gotError(e);
-            throw e;
-        }
+        const result = await this.apiQuery('BeginSessionV2', packet, await account.getProxy());
 
         const errorCantParse = new Error('Can\'t parse session token');
 
         let sessionToken;
-
         try {
             sessionToken = result.SessionToken[0];
         } catch {
-            account.gotError(errorCantParse);
             throw errorCantParse;
         }
 
         if (!(typeof sessionToken === 'string' && sessionToken.length >= 15)) {
-            account.gotError(errorCantParse);
             throw errorCantParse;
         }
 

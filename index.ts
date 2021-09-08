@@ -45,4 +45,5 @@ Promise.all(promises)
     })
     .finally(async () => {
         await log.info(`runParser() The task queue been done`);
+        process.exit(0);
     })

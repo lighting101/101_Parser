@@ -547,13 +547,8 @@ describe('saveAccount()', () => {
         const id = genId();
 
         // @ts-ignore
-        account.getSession = jest.fn().mockResolvedValue(session);
-
-        // @ts-ignore
-        account.getCustAccCode = jest.fn().mockReturnValue(cac);
-
-        // @ts-ignore
-        account.getProxy = jest.fn().mockResolvedValue(proxy);
+        account.getAccountOptions = jest.fn()
+            .mockReturnValue({ session, proxy, cac });
 
         // @ts-ignore
         account.getID = jest.fn().mockReturnValue(id);

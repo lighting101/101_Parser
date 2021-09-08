@@ -57,42 +57,45 @@ export default class Account implements IAccount
             this.startProcess();
         }
 
-        if (typeof this.session === 'undefined') {
+        if (typeof this.session !== 'string') {
             try {
                 this.session = await this.CBAPI.openSession(this);
             } catch (e) {
                 if (/Password could not be validated/i.test(e.message)) {
                     this.stopProcess();
                     this.setPasswordInvalid();
-                    await this.log.error(`[${this.getLogin()}] Login/Password could not be validated`);
-                } else {
-                    await this.log.error(`[${this.getLogin()}] ${e.name}: ${e.message}`);
+                    await this.log.error(`Login/Password could not be validated`);
                 }
 
+                this.gotError(e);
                 throw e;
             }
 
-            await this.log.info(`[${this.getLogin()}] session was opened`);
+            await this.log.info(`Session was opened: ${this.session}`);
         }
 
         return this.session;
     }
 
     async getProxy():Promise<string> {
-        if (typeof this.proxy === 'undefined') {
+        if (typeof this.proxy !== 'string') {
             this.proxy = await this.ProxyProvider.getProxy();
         }
 
         return this.proxy;
     }
 
-    gotError(e:Error):number {
-        const errorStr = `[${this.getLogin()}] ${e.name}: ${e.message}`;
-        this.log.error(errorStr).then();
-
+    gotError(e:Error):void {
+        this.log.error(`${e.name}: ${e.message}`);
         this.stopProcess();
+    }
 
-        return ++this.errorsCount;
+    getAccountOptions(): { proxy: string | undefined; cac: string; session: string | undefined } {
+        return {
+            session: this.session,
+            proxy: this.proxy,
+            cac: this.CAC
+        }
     }
 
     accountInactive():boolean {

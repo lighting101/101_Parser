@@ -42,9 +42,28 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         this.removeAccount(account);
     }
 
-    protected async errorHandler(e:Error, account:IAccount, recursion?:() => Promise<any>):Promise<any> {
-        if (/Password could not be validated/i.test(e.message)) {
+    /**
+     * If error indicates that the account is not working - returns true, else false
+     * @param e
+     * @protected
+     */
+    protected isErrAccInvalid(e:Error):boolean {
+        const errors = [
+            /Password could not be validated/i,
+            /Not associated with an account that has RDB access/i,
+        ];
+
+        for (const errMsg of errors) {
+            if (errMsg.test(e.message)) return true;
+        }
+
+        return false;
+    }
+
+    protected async errorHandler(e:Error, account:Account, recursion?:() => Promise<any>):Promise<any> {
+        if (this.isErrAccInvalid(e)) {
             await this.passwordInvalid(account);
+
             if (typeof recursion !== 'undefined') {
                 return await recursion();
             }
@@ -176,11 +195,7 @@ export default class CBAccountPoolDB implements ICBAccountPool {
 
     protected async saveAccount(account:IAccount):Promise<void> {
         const params = [
-            {
-                session: await account.getSession(true),
-                cac: account.getCustAccCode(),
-                proxy: await account.getProxy()
-            },
+            account.getAccountOptions(),
             account.getID()
         ];
 

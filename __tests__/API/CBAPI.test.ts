@@ -201,25 +201,6 @@ describe('openSession() method', () => {
                             expect(e.message).toContain('Can\'t parse session token');
                         }
                     })
-
-                    it('Must be call Account.gotError()', async () => {
-                        expect.assertions(1);
-
-                        const account:IAccount = getCBAccount()
-                        const api = new CBAPI();
-
-                        // @ts-ignore
-                        api.apiQuery = jest.fn(() => Promise.resolve({
-                            SessionToken: ""
-                        }));
-
-                        try {
-                            await api.openSession(account);
-                        } catch {
-                            // @ts-ignore
-                            expect(account.gotError.mock.calls.length).toBe(1);
-                        }
-                    })
                 })
 
                 describe('if key SessionToken is not defined', () => {
@@ -238,25 +219,6 @@ describe('openSession() method', () => {
                             await api.openSession(account);
                         } catch(e) {
                             expect(e.message).toContain('Can\'t parse session token');
-                        }
-                    })
-
-                    it('Must be call Account.gotError()', async () => {
-                        expect.assertions(1);
-
-                        const account:IAccount = getCBAccount()
-                        const api = new CBAPI();
-
-                        // @ts-ignore
-                        api.apiQuery = jest.fn(() => Promise.resolve({
-                            SomeObject: [ "some data" ]
-                        }));
-
-                        try {
-                            await api.openSession(account);
-                        } catch(e) {
-                            // @ts-ignore
-                            expect(account.gotError.mock.calls.length).toBe(1);
                         }
                     })
                 })
@@ -278,23 +240,6 @@ describe('openSession() method', () => {
                         expect(e).not.toBeUndefined();
                     }
                 })
-
-                it('Calling Account.gotError()?', async () => {
-                    expect.assertions(1);
-
-                    const account:IAccount = getCBAccount()
-                    const api = new CBAPI();
-
-                    // @ts-ignore
-                    api.apiQuery = jest.fn(() => Promise.reject(new Error('Some error')));
-
-                    try {
-                        await api.openSession(account);
-                    } catch(e) {
-                        // @ts-ignore
-                        expect(account.gotError.mock.calls.length).toBe(1);
-                    }
-                })
             })
         })
     })
@@ -303,7 +248,7 @@ describe('openSession() method', () => {
 describe('getResumeList()', () => {
 
     const getCBAccount = (proxy = "http://141.98.235.125:10012",
-                          session = "ddafb0de1ce845c5a4cce9db8fb716d8-683658211-CS-4") => {
+                          session = "ddafb0de1ce8ccccaccce9db8fb716d8-888888888-AS-4") => {
 
         const account = new Account(<AccountBuilder> {});
 
@@ -694,7 +639,7 @@ describe('getResumeList()', () => {
                 const task:TaskFormat = {
                     data: {
                         kind: 'resume',
-                        resumeID: "R2Z6X65W0GSJ0WS3C44"
+                        resumeID: "R2Z6X65W00000003C44"
                     }
                 };
 
@@ -716,7 +661,7 @@ describe('getResumeList()', () => {
                 const task:TaskFormat = {
                     data: {
                         kind: 'resume',
-                        resumeID: "R2Z6X65W0GSJ0WS3C44"
+                        resumeID: "R2Z6X65W00000003C44"
                     }
                 };
 
@@ -741,7 +686,7 @@ describe('getResumeList()', () => {
                 const task:TaskFormat = {
                     data: {
                         kind: 'resume',
-                        resumeID: "R2Z6X65W0GSJ0WS3C44"
+                        resumeID: "R2Z6X65W00000003C44"
                     }
                 };
 
@@ -919,7 +864,7 @@ describe('getResumeList()', () => {
 describe('getResume()', () => {
 
     const getCBAccount = (proxy = "http://141.98.235.125:10012",
-                          session = "ddafb0de1ce845c5a4cce9db8fb716d8-683658211-CS-4") => {
+                          session = "ddafb0de1ce845c5a4cce9db8fb716d8-888888888-AS-4") => {
 
         const account = new Account(<AccountBuilder> {});
 
@@ -939,7 +884,7 @@ describe('getResume()', () => {
             const task:TaskFormat = {
                 data: {
                     kind: 'resume',
-                    resumeID: "R2Z6X65W0GSJ0WS3C44"
+                    resumeID: "R2Z6X65W00000003C44"
                 }
             };
 
@@ -964,7 +909,7 @@ describe('getResume()', () => {
             const task:TaskFormat = {
                 data: {
                     kind: 'resume',
-                    resumeID: "R2Z6X65W0GSJ0WS3C44"
+                    resumeID: "R2Z6X65W00000003C44"
                 }
             };
 
@@ -992,7 +937,7 @@ describe('getResume()', () => {
                 const task:TaskFormat = {
                     data: {
                         kind: 'resume',
-                        resumeID: "R2Z6X65W0GSJ0WS3C44"
+                        resumeID: "R2Z6X65W00000003C44"
                     }
                 };
 
@@ -1019,7 +964,7 @@ describe('getResume()', () => {
                 const task:TaskFormat = {
                     data: {
                         kind: 'resume',
-                        resumeID: "R2Z6X65W0GSJ0WS3C44"
+                        resumeID: "R2Z6X65W00000003C44"
                     }
                 };
 
@@ -1046,7 +991,7 @@ describe('getResume()', () => {
                 const task:TaskFormat = {
                     data: {
                         kind: 'resume',
-                        resumeID: "R2Z6X65W0GSJ0WS3C44"
+                        resumeID: "R2Z6X65W00000003C44"
                     }
                 };
 
@@ -1072,7 +1017,7 @@ describe('getResume()', () => {
             const task:TaskFormat = {
                 data: {
                     kind: 'resume',
-                    resumeID: "R2Z6X65W0GSJ0WS3C44"
+                    resumeID: "R2Z6X65W00000003C44"
                 }
             };
 
@@ -1099,7 +1044,7 @@ describe('getResume()', () => {
             const task:TaskFormat = {
                 data: {
                     kind: 'resume',
-                    resumeID: "R2Z6X65W0GSJ0WS3C44"
+                    resumeID: "R2Z6X65W00000003C44"
                 }
             };
 
@@ -1131,7 +1076,7 @@ describe('getResume()', () => {
             const task:TaskFormat = {
                 data: {
                     kind: 'resume',
-                    resumeID: "R2Z6X65W0GSJ0WS3C44"
+                    resumeID: "R2Z6X65W00000003C44"
                 }
             };
 
@@ -1168,7 +1113,7 @@ describe('getResume()', () => {
                 const task:TaskFormat = {
                     data: {
                         kind: 'resume',
-                        resumeID: "R2Z6X65W0GSJ0WS3C44"
+                        resumeID: "R2Z6X65W00000003C44"
                     }
                 };
 
@@ -1195,7 +1140,7 @@ describe('getResume()', () => {
                 const task:TaskFormat = {
                     data: {
                         kind: 'resume',
-                        resumeID: "R2Z6X65W0GSJ0WS3C44"
+                        resumeID: "R2Z6X65W00000003C44"
                     }
                 };
 
@@ -1206,8 +1151,8 @@ describe('getResume()', () => {
                             City: [ "Atlanta" ]
                         }
                     ],
-                    ContactEmail: [ "csolomon_homes@yahoo.com" ],
-                    ContactName: [ "Collin Solomon" ]
+                    ContactEmail: [ "csolomon_holmes@msn.com" ],
+                    ContactName: [ "Colin Solomon" ]
                 }));
 
                 try {

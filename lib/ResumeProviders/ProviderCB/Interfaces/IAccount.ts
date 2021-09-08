@@ -5,7 +5,7 @@ export default interface IAccount
     getPassword(): string
     getProxy(): Promise<string>
     getID(): number|undefined
-    gotError(e:Error):number
+    gotError(e:Error):void
     canProcess():boolean
     successProcessed(resumeParsed?:boolean):void
     getCustAccCode():string

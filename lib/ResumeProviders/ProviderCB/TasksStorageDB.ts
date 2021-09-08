@@ -62,10 +62,10 @@ export default class TasksStorageDB implements ITasksStorage
             throw new Error('No any tasks in DB');
         }
 
-        const sql2 = 'update `tasks` set `processing` = unix_timestamp() where `id` in (?)';
+        const sql2 = 'update `tasks` set `processing` = now() where `id` in (?)';
 
         const taskIDs = tasks.map(task => task.id)
-        await this.log.debug(`getTasks() prepare query tu update the 'processing' field (IDs:${taskIDs.length})`);
+        await this.log.debug(`getTasks() prepare query to update the 'processing' field (amount of IDs=${taskIDs.length})`);
         await this.db.query(sql2, [ taskIDs ]);
         await this.log.debug(`getTasks() query was done`);
 
@@ -120,7 +120,7 @@ export default class TasksStorageDB implements ITasksStorage
             returnTasks.push( <TaskFormat> {data, id} );
         }
 
-        await this.log.debug(`getTasks() finish, found ${returnTasks} tasks`);
+        await this.log.debug(`getTasks() finish, found ${returnTasks.length} tasks`);
 
         return returnTasks;
     }

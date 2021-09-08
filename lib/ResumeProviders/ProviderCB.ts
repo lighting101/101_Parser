@@ -15,6 +15,11 @@ export default class ProviderCB implements IProvider
     private accountPool:ICBAccountPool;
     protected name = 'CareerBuilder';
 
+    protected notCriticalErrors = [
+        /Accounts list is empty/i,
+        /Not associated with an account that has RDB access/i
+    ];
+
     constructor(taskProvider:ITasks = new Tasks(),
                 accountPool:ICBAccountPool = new CBAccountPoolDB(),
                 log = new Log('ProviderCB')) {
@@ -112,9 +117,17 @@ export default class ProviderCB implements IProvider
         await this.log.debug(`taskProcessor() finish`);
     }
 
+    protected isItNotCriticalError(e:Error):boolean {
+        for (const errMsg of this.notCriticalErrors) {
+            if (errMsg.test(e.message)) return true;
+        }
+
+        return false;
+    }
+
     protected async goErrorHandler(e:Error):Promise<void> {
-        if (/Accounts list is empty/i.test(e.message)) {
-            await this.log.debug('Not enough alive accounts');
+        if (this.isItNotCriticalError(e)) {
+            await this.log.debug(`${e.name} ${e.message}`);
         } else {
             await this.log.error(`go() ${e.name}: ${e.message}`);
             throw e;
@@ -126,7 +139,7 @@ export default class ProviderCB implements IProvider
 
         const tasks = await this.tasks.getTasks();
 
-        await this.log.debug(`go() got ${tasks} tasks`);
+        await this.log.debug(`go() got ${tasks.length} tasks`);
 
         await Promise.all(tasks.map(async task => {
             try {

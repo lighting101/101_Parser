@@ -3,8 +3,8 @@
 exports[`getResume() The method apiQuery() calling Check arguments of apiQuery() ...packet (to match snapshot) 1`] = `
 "
             <Packet>
-                <SessionToken>ddafb0de1ce845c5a4cce9db8fb716d8-683658211-CS-4</SessionToken>
-                <ResumeID>R2Z6X65W0GSJ0WS3C44</ResumeID>
+                <SessionToken>ddafb0de1ce845c5a4cce9db8fb716d8-888888888-AS-4</SessionToken>
+                <ResumeID>R2Z6X65W00000003C44</ResumeID>
                 <CustAcctCode>CA101</CustAcctCode>
                 <GetWordDocIfAvailable>False</GetWordDocIfAvailable>
             </Packet>"
@@ -22,7 +22,7 @@ Object {
 exports[`getResumeList() The method apiQuery() calling Check arguments of apiQuery() ...packet 1`] = `
 "
         <Packet>
-            <SessionToken>ddafb0de1ce845c5a4cce9db8fb716d8-683658211-CS-4</SessionToken>
+            <SessionToken>ddafb0de1ce8ccccaccce9db8fb716d8-888888888-AS-4</SessionToken>
             <Keywords>driver OR cashier</Keywords>
             <City>Atlanta</City>
             <State>GA</State>

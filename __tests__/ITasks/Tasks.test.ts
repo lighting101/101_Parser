@@ -21,19 +21,23 @@ function tasksFactory() {
 }
 
 describe('getTasks()', () => {
-    it('On "No any task in db" exception method must be return a result of the rootTasks() method', async () => {
+    it('On "No any task in db" exception method must be take rootTasks() and send its to storage', async () => {
         expect.assertions(1);
 
         const {tasks, storage} = tasksFactory();
 
         storage.getTasks = jest.fn()
-            .mockRejectedValue(new Error('No any tasks in DB'));
+            .mockRejectedValue(new Error('Undefined error'))
+            .mockRejectedValueOnce(new Error('No any tasks in DB'));
 
         const rootTasksResult = tasks.rootTasks();
 
-        const result = await tasks.getTasks();
-
-        expect(result).toMatchObject(rootTasksResult);
+        try {
+            await tasks.getTasks();
+        } catch {
+            // @ts-ignore
+            expect(storage.putTasks.mock.calls[0][0]).toMatchObject(rootTasksResult);
+        }
     });
 
     it('If it got an undefined exception, must be throw it up', async () => {
