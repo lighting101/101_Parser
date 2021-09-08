@@ -28,9 +28,13 @@ export default class TasksStorageDB implements ITasksStorage
     }
 
     async getTasks(): Promise<TaskFormat[]> {
+        await this.log.debug(`getTasks() started`);
+
         let tasks:TasksDB[];
 
+        await this.log.debug(`getTasks() starting transaction...`);
         await db.beginTransaction();
+        await this.log.debug(`getTasks() transaction has been started`);
 
         // get tasks with status = 1 (waiting for process)
         const sql1 = 'SELECT `id`, `type`, `data` ' +
@@ -40,9 +44,14 @@ export default class TasksStorageDB implements ITasksStorage
             'limit ?';
 
         try {
+            await this.log.debug(`getTasks() trying to get tasks from the DB...`);
             tasks = await db.query(sql1, [ maxHoursTaskCanProcessing, TASKS_LIMIT ]);
+            await this.log.debug(`getTasks() got ${tasks.length} rows from the DB`);
         } catch (e) {
+            await this.log.debug(`getTasks() caught error ${e.name}: ${e.message}`);
+            await this.log.debug(`getTasks() starting rollback operation...`);
             await db.rollback();
+            await this.log.debug(`getTasks() rollback done`);
             throw e;
         }
 
@@ -53,9 +62,13 @@ export default class TasksStorageDB implements ITasksStorage
         const sql2 = 'update `tasks` set `processing` = unix_timestamp() where `id` in (?)';
 
         const taskIDs = tasks.map(task => task.id)
+        await this.log.debug(`getTasks() prepare query tu update the 'processing' field (IDs:${taskIDs.length})`);
         await db.query(sql2, [ taskIDs ]);
+        await this.log.debug(`getTasks() query was done`);
 
+        await this.log.debug(`getTasks() committing transaction...`);
         await db.commit();
+        await this.log.debug(`getTasks() committed`);
 
         const returnTasks:TaskFormat[] = [];
 
@@ -104,11 +117,12 @@ export default class TasksStorageDB implements ITasksStorage
             returnTasks.push( <TaskFormat> {data, id} );
         }
 
+        await this.log.debug(`getTasks() finish, found ${returnTasks} tasks`);
+
         return returnTasks;
     }
 
     async putTask(task: TaskFormat): Promise<void> {
-        const sql = 'insert ignore into `tasks` set ?';
         const type = task.data.kind;
 
         if (!(type === 'resume' || type === 'branch')) {
@@ -117,11 +131,8 @@ export default class TasksStorageDB implements ITasksStorage
             throw new Error(errorMsg);
         }
 
-        await db.query(sql, [{
-            type,
-            data: JSON.stringify(task.data),
-            controlhash: 'md5(data)'
-        }]);
+        const sql = 'insert ignore into `tasks` set type=?, data=?, controlhash=md5(data)';
+        await db.query(sql, [ type, JSON.stringify(task.data) ]);
     }
 
     async putTasks(tasks: Array<TaskFormat>): Promise<void> {

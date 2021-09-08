@@ -25,10 +25,6 @@ export const FRESHNESS = +process.env.FRESHNESS || 30;
 // @ts-ignore
 export const ROWS_PER_PAGE = +process.env.ROWS_PER_PAGE || 400;
 
-// Максимально параллельно потоков работы
-// @ts-ignore
-export const maxThreads = +process.env.MAX_THREADS || 10;
-
 // Максимальное время, которое аккаунт находится в работе. Если что-то подвиснет
 // и до этого времени аккаунт не сменит статус с занят на свободен, то сброс
 // произойдёт принудительно

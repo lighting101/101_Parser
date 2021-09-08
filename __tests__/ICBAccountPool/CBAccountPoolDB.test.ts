@@ -6,7 +6,9 @@ import AccountBuilder from "../../lib/ResumeProviders/ProviderCB/AccountBuilder"
 import {JoberFormat, TaskFormat} from "../../common";
 import { generate } from "randomstring";
 import IAccount from "../../lib/ResumeProviders/ProviderCB/Interfaces/IAccount";
+import EventsDB from "../../lib/ResumeProviders/ProviderCB/EventsDB";
 
+jest.mock("../../lib/ResumeProviders/ProviderCB/EventsDB");
 jest.mock("../../lib/LogDB");
 jest.mock("../../lib/ResumeProviders/ProviderCB/CBAPI");
 jest.mock("../../lib/ResumeProviders/ProviderCB/Account");

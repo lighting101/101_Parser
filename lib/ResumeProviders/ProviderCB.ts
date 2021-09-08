@@ -51,6 +51,8 @@ export default class ProviderCB implements IProvider
     }
 
     protected async branchTaskHandler(task:TaskFormat):Promise<void> {
+        await this.log.debug(`branchTaskHandler() start`);
+
         if (task.data.kind !== 'branch')
             throw new Error(`branchTaskHandler() Error the task type: ${JSON.stringify(task)}`);
 
@@ -66,6 +68,8 @@ export default class ProviderCB implements IProvider
             throw e;
         }
 
+        await this.log.debug(`branchTaskHandler() ${{page, maxPage, resumes: resumes.length}}`);
+
         await this.tasks.putTasksResumes(resumes);
 
         if (page === 1 && maxPage > 1) {
@@ -73,6 +77,8 @@ export default class ProviderCB implements IProvider
                 await this.tasks.putTasksListing(task.data.city, task.data.state, i);
             }
         }
+
+        await this.log.debug(`branchTaskHandler() finish`);
     }
 
     protected async resumeTaskHandler(task:TaskFormat):Promise<void> {
@@ -93,6 +99,8 @@ export default class ProviderCB implements IProvider
     }
 
     protected async taskProcessor(task:TaskFormat):Promise<void> {
+        await this.log.debug(`taskProcessor() start`);
+
         if (task.data.kind === 'branch') {
             await this.branchTaskHandler(task);
         } else if (task.data.kind === 'resume') {
@@ -100,6 +108,8 @@ export default class ProviderCB implements IProvider
         } else throw new Error('Undefined parse task type');
 
         await this.tasks.markDone(task);
+
+        await this.log.debug(`taskProcessor() finish`);
     }
 
     protected async goErrorHandler(e:Error):Promise<void> {
@@ -115,6 +125,9 @@ export default class ProviderCB implements IProvider
         await this.log.debug('go() started');
 
         const tasks = await this.tasks.getTasks();
+
+        await this.log.debug(`go() got ${tasks} tasks`);
+
         await Promise.all(tasks.map(async task => {
             try {
                 await this.taskProcessor(task);

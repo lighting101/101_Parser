@@ -8,6 +8,8 @@ import ITasksStorage from "./Interfaces/ITaskStorage";
 import ITasks from "./Interfaces/ITasks";
 import * as fs from "fs";
 import {FRESHNESS, ROWS_PER_PAGE} from "../../../config";
+import LogDB from "../../LogDB";
+import ILog from "../../Interfaces/ILog";
 
 export default class Tasks implements ITasks {
     private storage:ITasksStorage;
@@ -15,22 +17,25 @@ export default class Tasks implements ITasks {
     private readonly keywords:string;
     private readonly freshness:number;
     private readonly rowsPerPage:number;
+    private log:ILog;
 
     constructor(storage:ITasksStorage = new TasksStorageDB(),
                 optionFreshness = FRESHNESS,
-                optionRowsPerPage = ROWS_PER_PAGE) {
+                optionRowsPerPage = ROWS_PER_PAGE,
+                optionLogger = new LogDB('Tasks')) {
 
         this.storage = storage;
         this.freshness = optionFreshness;
         this.rowsPerPage = optionRowsPerPage;
+        this.log = optionLogger;
 
-        const cities:Array<string> = JSON.parse(fs.readFileSync("./json/cities_states.json").toString());
+        const cities:Array<string> = JSON.parse(fs.readFileSync("lib/ResumeProviders/ProviderCB/json/cities_states.json").toString());
         for (const cityState of cities) {
             const [city, state] = cityState.split(",");
             this.cities.push([city, state]);
         }
 
-        this.keywords = JSON.parse(fs.readFileSync("./json/keywords.json").toString()).join(' OR ');
+        this.keywords = JSON.parse(fs.readFileSync("lib/ResumeProviders/ProviderCB/json/keywords.json").toString()).join(' OR ');
     }
 
     markDone(task: TaskFormat): Promise<void> {
@@ -38,6 +43,8 @@ export default class Tasks implements ITasks {
     }
 
     async getTasks(): Promise<TaskFormat[]> {
+        await this.log.debug(`getTasks() started`);
+
         let tasks: TaskFormat[] = [];
 
         try {
@@ -52,8 +59,10 @@ export default class Tasks implements ITasks {
         }
 
         if (!tasks.length) {
+            await this.log.info(`getTasks() no any tasks, start recursion!`);
             return await this.getTasks();
         } else {
+            await this.log.debug(`getTasks() found ${tasks.length} tasks`);
             return tasks;
         }
     }

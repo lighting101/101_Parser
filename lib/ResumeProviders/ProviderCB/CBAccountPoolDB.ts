@@ -8,6 +8,8 @@ import AccountBuilder from "./AccountBuilder";
 import { TaskFormat, JoberFormat } from "../../../common";
 import CBAPI from "./CBAPI";
 import ICBAPI from "./Interfaces/ICBAPI";
+import EventsDB from "./EventsDB";
+import IEvents from "./Interfaces/IEvents";
 
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve => setTimeout(() => resolve(), ms)));
@@ -18,13 +20,16 @@ export default class CBAccountPoolDB implements ICBAccountPool {
     protected accounts: Array<IAccount> = [];
     private log: ILog;
     private CBAPI:ICBAPI;
+    private events:IEvents;
 
     constructor(logProvider: ILog = new LogDB('CBAccountPool'),
-                CBAPIProvider:ICBAPI = new CBAPI()) {
+                CBAPIProvider:ICBAPI = new CBAPI(),
+                events = new EventsDB()) {
 
         this.log = logProvider;
         this.CBAPI = CBAPIProvider;
         this.db = new Database();
+        this.events = events;
     }
 
     protected async passwordInvalid(account:IAccount):Promise<void> {
@@ -64,6 +69,8 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         if (account.accountInactive()) {
             await this.removeInactiveAccount(account);
         }
+
+        await this.events.parseResume(account);
 
         return resume;
     }

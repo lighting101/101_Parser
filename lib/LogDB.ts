@@ -13,8 +13,8 @@ type LogDBConfig = {
 }
 
 const defaultConfig:LogDBConfig = {
-    Database: ErrorLevels.info,
-    Console: ErrorLevels.error
+    Database: ErrorLevels.debug,
+    Console: ErrorLevels.debug
 }
 
 export default class LogDB implements ILog {
@@ -49,13 +49,15 @@ export default class LogDB implements ILog {
     }
 
     private async drawMessage(message:string, level:number) {
+        const fullMessage = `${this.moduleName} -> ${message}`;
+
         if (level >= this.config.Console) {
-            console.log(message);
+            console.log(fullMessage);
         }
 
         if (level >= this.config.Database) {
             const sql = 'insert into `log` set ?'
-            await this.db.query(sql, [{ message, level: this.level2Text(level) }])
+            await this.db.query(sql, [{ message: fullMessage, level: this.level2Text(level) }])
         }
     }
 }
