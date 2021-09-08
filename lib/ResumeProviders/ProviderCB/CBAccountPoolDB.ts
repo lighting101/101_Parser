@@ -1,5 +1,4 @@
 import ICBAccountPool from "./Interfaces/ICBAccountPool";
-import IAccount from "./Interfaces/IAccount";
 import Database from "../../Database";
 import LogDB from "../../LogDB";
 import ILog from "../../Interfaces/ILog";
@@ -9,7 +8,7 @@ import { TaskFormat, JoberFormat } from "../../../common";
 import CBAPI from "./CBAPI";
 import ICBAPI from "./Interfaces/ICBAPI";
 import EventsDB from "./EventsDB";
-import IEvents from "./Interfaces/IEvents";
+import Account from "./Account";
 
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve => setTimeout(() => resolve(), ms)));
@@ -17,10 +16,10 @@ function sleep(ms: number): Promise<void> {
 
 export default class CBAccountPoolDB implements ICBAccountPool {
     protected db:Database;
-    protected accounts: Array<IAccount> = [];
+    protected accounts: Array<Account> = [];
     private log: ILog;
     private CBAPI:ICBAPI;
-    private events:IEvents;
+    private events:EventsDB;
 
     constructor(logProvider: ILog = new LogDB('CBAccountPool'),
                 CBAPIProvider:ICBAPI = new CBAPI(),
@@ -32,13 +31,13 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         this.events = events;
     }
 
-    protected async passwordInvalid(account:IAccount):Promise<void> {
+    protected async passwordInvalid(account:Account):Promise<void> {
         await this.setDisableAccount(account);
         this.removeAccount(account);
     }
 
-    protected async removeInactiveAccount(account:IAccount):Promise<void> {
-        await this.saveAccount(account);
+    protected async removeInactiveAccount(account:Account):Promise<void> {
+        await this.saveAccount(<Account> account);
         this.removeAccount(account);
     }
 
@@ -118,7 +117,7 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         this.accounts.push(account);
     }
 
-    async getAccount(): Promise<IAccount> {
+    async getAccount(): Promise<Account> {
         if (this.accounts.length === 0) {
             const errorMsg = 'Accounts list is empty'
             await this.log.error(errorMsg);
@@ -179,12 +178,12 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         }
     }
 
-    protected async setDisableAccount(account:IAccount):Promise<void> {
+    protected async setDisableAccount(account:Account):Promise<void> {
         const sql = 'update `accounts` set `status` = 0 where `id` = ?';
         await this.db.query(sql, [ account.getID() ]);
     }
 
-    protected removeAccount(targetAccount:IAccount):void {
+    protected removeAccount(targetAccount:Account):void {
         for (let i = 0, l = this.accounts.length; i < l; i++) {
             const account = this.accounts[i];
             if (account === targetAccount) {
@@ -193,7 +192,7 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         }
     }
 
-    protected async saveAccount(account:IAccount):Promise<void> {
+    protected async saveAccount(account:Account):Promise<void> {
         const params = [
             account.getAccountOptions(),
             account.getID()

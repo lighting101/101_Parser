@@ -1,14 +1,13 @@
 import Database from "../../Database";
-import IAccount from "./Interfaces/IAccount";
-import IEvents from "./Interfaces/IEvents";
+import Account from "./Account";
 
-export default class EventsDB implements IEvents{
+export default class EventsDB {
     db:Database;
 
     constructor(oDB = new Database()) {
         this.db = oDB;
     }
-    async parseResume(account:IAccount):Promise<void> {
+    async parseResume(account:Account):Promise<void> {
         const sql = 'insert delayed into events set ?';
         await this.db.query(sql, [ {
             type: 'resume_parse',
