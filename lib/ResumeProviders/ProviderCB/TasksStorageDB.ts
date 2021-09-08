@@ -5,7 +5,6 @@ import ITasksStorage from "./Interfaces/ITaskStorage";
 import {TaskType} from "../../../common";
 import LogDB from "../../LogDB";
 import ILog from "../../Interfaces/ILog";
-const db = new Database();
 
 type TasksDB = {
     id: number,
@@ -17,14 +16,18 @@ type TasksDB = {
 export default class TasksStorageDB implements ITasksStorage
 {
     private log:ILog;
+    private db:Database;
 
-    constructor(logProvider = new LogDB('TaskStorageDB')) {
+    constructor(logProvider = new LogDB('TaskStorageDB'),
+                oDB = new Database()) {
+
         this.log = logProvider;
+        this.db = oDB;
     }
 
     async markDone(task: TaskFormat): Promise<void> {
         const sql = 'update `tasks` set `done` = 1 where `id` = ?';
-        await db.query(sql, [ task.id ]);
+        await this.db.query(sql, [ task.id ]);
     }
 
     async getTasks(): Promise<TaskFormat[]> {
@@ -33,24 +36,24 @@ export default class TasksStorageDB implements ITasksStorage
         let tasks:TasksDB[];
 
         await this.log.debug(`getTasks() starting transaction...`);
-        await db.beginTransaction();
+        await this.db.beginTransaction();
         await this.log.debug(`getTasks() transaction has been started`);
 
         // get tasks with status = 1 (waiting for process)
         const sql1 = 'SELECT `id`, `type`, `data` ' +
             'FROM `tasks` ' +
-            'WHERE `done` = 0 and `processing` > date_sub(now(), interval ? hour) ' +
+            'WHERE `done` = 0 and `processing` < date_sub(now(), interval ? hour) ' +
             'order by `type` asc, `ts` asc ' +
             'limit ?';
 
         try {
             await this.log.debug(`getTasks() trying to get tasks from the DB...`);
-            tasks = await db.query(sql1, [ maxHoursTaskCanProcessing, TASKS_LIMIT ]);
+            tasks = await this.db.query(sql1, [ maxHoursTaskCanProcessing, TASKS_LIMIT ]);
             await this.log.debug(`getTasks() got ${tasks.length} rows from the DB`);
         } catch (e) {
             await this.log.debug(`getTasks() caught error ${e.name}: ${e.message}`);
             await this.log.debug(`getTasks() starting rollback operation...`);
-            await db.rollback();
+            await this.db.rollback();
             await this.log.debug(`getTasks() rollback done`);
             throw e;
         }
@@ -63,11 +66,11 @@ export default class TasksStorageDB implements ITasksStorage
 
         const taskIDs = tasks.map(task => task.id)
         await this.log.debug(`getTasks() prepare query tu update the 'processing' field (IDs:${taskIDs.length})`);
-        await db.query(sql2, [ taskIDs ]);
+        await this.db.query(sql2, [ taskIDs ]);
         await this.log.debug(`getTasks() query was done`);
 
         await this.log.debug(`getTasks() committing transaction...`);
-        await db.commit();
+        await this.db.commit();
         await this.log.debug(`getTasks() committed`);
 
         const returnTasks:TaskFormat[] = [];
@@ -132,7 +135,7 @@ export default class TasksStorageDB implements ITasksStorage
         }
 
         const sql = 'insert ignore into `tasks` set type=?, data=?, controlhash=md5(data)';
-        await db.query(sql, [ type, JSON.stringify(task.data) ]);
+        await this.db.query(sql, [ type, JSON.stringify(task.data) ]);
     }
 
     async putTasks(tasks: Array<TaskFormat>): Promise<void> {

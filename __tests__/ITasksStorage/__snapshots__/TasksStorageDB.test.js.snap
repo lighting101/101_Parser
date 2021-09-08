@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getTasks() Accordance of the well-result snapshot 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "kind": "resume",
+      "resumeID": "R0000000",
+    },
+    "id": 1,
+  },
+  Object {
+    "data": Object {
+      "kind": "resume",
+      "resumeID": "R0000001",
+    },
+    "id": 2,
+  },
+  Object {
+    "data": Object {
+      "kind": "resume",
+      "resumeID": "R0000002",
+    },
+    "id": 3,
+  },
+  Object {
+    "data": Object {
+      "kind": "resume",
+      "resumeID": "R0000003",
+    },
+    "id": 4,
+  },
+  Object {
+    "data": Object {
+      "kind": "resume",
+      "resumeID": "R0000004",
+    },
+    "id": 5,
+  },
+]
+`;
