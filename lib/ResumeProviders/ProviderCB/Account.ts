@@ -4,6 +4,7 @@ import IProxyPool from "../../Interfaces/IProxyPool";
 import ILog from "../../Interfaces/ILog";
 import {MAX_ERRORS_ACCOUNT} from "../../../config";
 import AccountBuilder from "./AccountBuilder";
+import {FetchError} from "node-fetch";
 
 export default class Account implements IAccount
 {
@@ -85,7 +86,20 @@ export default class Account implements IAccount
         return this.proxy;
     }
 
+    markBadProxy():void {
+        if (typeof this.proxy !== 'string') return;
+
+        this.ProxyProvider.badProxy(this.proxy);
+        this.proxy = undefined;
+    }
+
     gotError(e:Error):void {
+        if (e instanceof FetchError) {
+            this.markBadProxy();
+        }
+
+        this.errorsCount++;
+
         this.log.error(`${e.name}: ${e.message}`);
         this.stopProcess();
     }
