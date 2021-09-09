@@ -10,14 +10,13 @@ export default class ProxyPoolFineproxy implements IProxyPool
     private updateTimer:number;
     private proxyList:string[] = [];
 
-    constructor() {
-        // Сделать передачу логина и пароля через конструктор
-        if (fineproxy.login === '' || fineproxy.pass === '') {
+    constructor(login = fineproxy.login, pass = fineproxy.pass) {
+        if (login.length < 3 || pass.length < 3) {
             throw new Error('Not set login/pass for FineProxy');
         }
 
-        this.login = fineproxy.login;
-        this.pass = fineproxy.pass;
+        this.login = login;
+        this.pass = pass;
         this.updateTimer = fineproxy.updateTimer;
     }
 
