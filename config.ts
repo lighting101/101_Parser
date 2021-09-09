@@ -36,9 +36,18 @@ export const maxTimeLimitForAccount = (+process.env.MAX_TIMELIMIT_ACCOUNT || 5) 
 // @ts-ignore
 export const maxHoursTaskCanProcessing = +process.env.MAX_HOURS_TASK_PROCESSING || 1;
 
+export const proxyModule:'FineProxy'|'FineProxyRedis' = 'FineProxyRedis';
+
 /* -- ProxyPoolFineproxy -- */
 export const fineproxy = {
     login: process.env.FINEPROXY_LOGIN || '',
     pass: process.env.FINEPROXY_PASSWORD || '',
     updateTimer: 1000 * 60 * 60 * 6 // Через сколько обновлять прокси-лист
+}
+
+export const redisHost = process.env.REDIS_HOST || '127.0.0.1';
+export const redisPort = process.env.REDIS_PORT || '6379';
+
+export const redisConfig = {
+    url: `redis://${redisHost}:${redisPort}`
 }

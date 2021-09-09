@@ -21,3 +21,9 @@ This parser runs by timer intervals and collect new resumes from job-board websi
 ### If using the ProxyPoolFineproxy class
 - **FINEPROXY_LOGIN**
 - **FINEPROXY_PASSWORD**
+
+### if using the ProxyPoolFineproxyRedis class ###
+- **FINEPROXY_LOGIN**
+- **FINEPROXY_PASSWORD**
+- **REDIS_HOST** _(default: 127.0.0.1)_
+- **REDIS_PORT** _(default: 6379)_

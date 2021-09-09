@@ -3,9 +3,9 @@ import ICBAPI from "./Interfaces/ICBAPI";
 import IProxyPool from "../../Interfaces/IProxyPool";
 import ILog from "../../Interfaces/ILog";
 import CBAPI from "./CBAPI";
-import ProxyPoolFineproxy from "../../ProxyPoolFineproxy";
 import LogDB from "../../LogDB";
 import {maxTimeLimitForAccount} from "../../../config";
+import ProxyPoolFactory from "../../ProxyPoolFactory";
 
 export default class AccountBuilder
 {
@@ -87,7 +87,7 @@ export default class AccountBuilder
         }
 
         if (typeof this.ProxyProvider === 'undefined') {
-            this.ProxyProvider = new ProxyPoolFineproxy();
+            this.ProxyProvider = ProxyPoolFactory();
         }
 
         if (typeof this.LogProvider === 'undefined') {

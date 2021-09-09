@@ -7,10 +7,6 @@ export default class ProxyPoolFineproxyRedis extends ProxyPoolFineproxy {
 
     protected redis_key = 'proxy';
 
-    constructor(...args:string[]) {
-        super(...args);
-    }
-
     protected async cleanList():Promise<void> {
         await rcli.del(this.redis_key);
     }
