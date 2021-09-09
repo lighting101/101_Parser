@@ -6,6 +6,10 @@ import ITasks from "./ProviderCB/Interfaces/ITasks";
 import CBAccountPoolDB from "./ProviderCB/CBAccountPoolDB";
 import ICBAccountPool from "./ProviderCB/Interfaces/ICBAccountPool";
 import ILog from "../Interfaces/ILog";
+import Database from "../Database";
+import {FetchError} from "node-fetch";
+
+const db = new Database();
 
 export default class ProviderCB implements IProvider
 {
@@ -14,11 +18,6 @@ export default class ProviderCB implements IProvider
     private log:ILog;
     private accountPool:ICBAccountPool;
     protected name = 'CareerBuilder';
-
-    protected notCriticalErrors = [
-        /Accounts list is empty/i,
-        /Not associated with an account that has RDB access/i
-    ];
 
     constructor(taskProvider:ITasks = new Tasks(),
                 accountPool:ICBAccountPool = new CBAccountPoolDB(),
@@ -118,9 +117,16 @@ export default class ProviderCB implements IProvider
     }
 
     protected isItNotCriticalError(e:Error):boolean {
-        for (const errMsg of this.notCriticalErrors) {
+        const notCriticalErrors = [
+            /Accounts list is empty/i,
+            /Not associated with an account that has RDB access/i
+        ];
+
+        for (const errMsg of notCriticalErrors) {
             if (errMsg.test(e.message)) return true;
         }
+
+        if (e instanceof FetchError) return true;
 
         return false;
     }
