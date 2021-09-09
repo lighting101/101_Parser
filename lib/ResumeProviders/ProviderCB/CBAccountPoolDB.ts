@@ -37,7 +37,7 @@ export default class CBAccountPoolDB implements ICBAccountPool {
     }
 
     protected async removeInactiveAccount(account:Account):Promise<void> {
-        await this.saveAccount(<Account> account);
+        await this.saveAccount(account);
         this.removeAccount(account);
     }
 
@@ -193,10 +193,10 @@ export default class CBAccountPoolDB implements ICBAccountPool {
     }
 
     protected async saveAccount(account:Account):Promise<void> {
-        const params = [
-            account.getAccountOptions(),
-            account.getID()
-        ];
+        const { session, proxy, cac } = account.getAccountOptions();
+        const id = account.getID();
+
+        const params = [ {session, proxy, cac}, id ];
 
         await this.db.query('update ' +
             '`accounts` set ? where `id` = ?', params);
