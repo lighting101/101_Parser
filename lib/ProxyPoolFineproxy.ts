@@ -6,9 +6,9 @@ export default class ProxyPoolFineproxy implements IProxyPool
 {
     private login:string;
     private pass:string;
-    private proxyList: Array<string> = [];
     private updated = 0;
     private updateTimer:number;
+    private proxyList:string[] = [];
 
     constructor() {
         // Сделать передачу логина и пароля через конструктор
@@ -21,7 +21,7 @@ export default class ProxyPoolFineproxy implements IProxyPool
         this.updateTimer = fineproxy.updateTimer;
     }
 
-    private cleanList():void {
+    protected async cleanList():Promise<void> {
         this.proxyList = [];
     }
 
@@ -43,6 +43,10 @@ export default class ProxyPoolFineproxy implements IProxyPool
         return await response.text();
     }
 
+    protected async addProxyToList(proxy:string):Promise<void> {
+        this.proxyList.push(proxy);
+    }
+
     private async loadProxies():Promise<void> {
         const txtList = await this.makeRequest();
 
@@ -57,11 +61,12 @@ export default class ProxyPoolFineproxy implements IProxyPool
             if (proxyFormatted.length < 7) continue;
 
             proxyFormatted = 'http://' + proxyFormatted;
-            this.proxyList.push(proxyFormatted);
+
+            await this.addProxyToList(proxyFormatted);
         }
     }
 
-    badProxy(proxy: string): void {
+    async badProxy(proxy: string):Promise<void> {
         for (let i = 0, l = this.proxyList.length; i < l; i++) {
             if (this.proxyList[i] === proxy) {
                 this.proxyList.splice(i, 1);
@@ -70,11 +75,11 @@ export default class ProxyPoolFineproxy implements IProxyPool
         }
     }
 
-    async getProxy(): Promise<string> {
-        if (this.timeToUpdateProxyList() || !this.proxyList.length) {
-            await this.loadProxies();
-        }
+    protected async proxyAmount():Promise<number> {
+        return this.proxyList.length;
+    }
 
+    protected async getProxyFromStorage():Promise<string> {
         const proxy = this.proxyList.shift();
 
         if (typeof proxy === 'undefined') {
@@ -84,6 +89,14 @@ export default class ProxyPoolFineproxy implements IProxyPool
         this.proxyList.push(proxy);
 
         return proxy;
+    }
+
+    async getProxy(): Promise<string> {
+        if (this.timeToUpdateProxyList() || !await this.proxyAmount()) {
+            await this.loadProxies();
+        }
+
+        return await this.getProxyFromStorage();
     }
 
 }
