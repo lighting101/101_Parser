@@ -80,4 +80,28 @@ export default class Redis {
             })
         })
     }
+
+    lpop(key_name:string):Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.rcli.lpop(key_name, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    rpop(key_name:string):Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.rcli.rpop(key_name, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
 }
