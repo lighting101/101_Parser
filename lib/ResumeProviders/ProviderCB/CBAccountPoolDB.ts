@@ -50,6 +50,8 @@ export default class CBAccountPoolDB implements ICBAccountPool {
         const errors = [
             /Password could not be validated/i,
             /Not associated with an account that has RDB access/i,
+            /Your account has been placed on Account hold/i,
+            /This resume is not applicable for the RDB product on your account/i,
         ];
 
         for (const errMsg of errors) {

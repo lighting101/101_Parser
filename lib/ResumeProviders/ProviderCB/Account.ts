@@ -93,12 +93,18 @@ export default class Account implements IAccount
         this.proxy = undefined;
     }
 
-    gotError(e:Error):void {
+    protected errorHandler(e:Error):void {
         if (e instanceof FetchError) {
             this.markBadProxy();
+        } else if (/Session token is invalid/i.test(e.message)) {
+            this.session = undefined;
+        } else {
+            this.errorsCount++;
         }
+    }
 
-        this.errorsCount++;
+    gotError(e:Error):void {
+        this.errorHandler(e);
 
         this.log.error(`${e.name}: ${e.message}`);
         this.stopProcess();
