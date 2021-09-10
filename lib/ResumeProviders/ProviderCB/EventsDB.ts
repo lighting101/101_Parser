@@ -8,7 +8,7 @@ export default class EventsDB {
         this.db = oDB;
     }
     async parseResume(account:Account):Promise<void> {
-        const sql = 'insert delayed into events set ?';
+        const sql = 'insert into events set ?';
         await this.db.query(sql, [ {
             type: 'resume_parse',
             account_id: account.getID()
