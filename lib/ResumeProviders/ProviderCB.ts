@@ -116,7 +116,8 @@ export default class ProviderCB implements IProvider
     protected isItNotCriticalError(e:Error):boolean {
         const notCriticalErrors = [
             /Accounts list is empty/i,
-            /Not associated with an account that has RDB access/i
+            /Not associated with an account that has RDB access/i,
+            /Session token is invalid/i,
         ];
 
         for (const errMsg of notCriticalErrors) {
