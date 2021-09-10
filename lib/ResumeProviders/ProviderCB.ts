@@ -6,10 +6,7 @@ import ITasks from "./ProviderCB/Interfaces/ITasks";
 import CBAccountPoolDB from "./ProviderCB/CBAccountPoolDB";
 import ICBAccountPool from "./ProviderCB/Interfaces/ICBAccountPool";
 import ILog from "../Interfaces/ILog";
-import Database from "../Database";
 import {FetchError} from "node-fetch";
-
-const db = new Database();
 
 export default class ProviderCB implements IProvider
 {
@@ -72,7 +69,7 @@ export default class ProviderCB implements IProvider
             throw e;
         }
 
-        await this.log.debug(`branchTaskHandler() ${{page, maxPage, resumes: resumes.length}}`);
+        await this.log.debug(`branchTaskHandler() ${JSON.stringify({page, maxPage, resumes: resumes.length})}`);
 
         await this.tasks.putTasksResumes(resumes);
 
@@ -99,7 +96,7 @@ export default class ProviderCB implements IProvider
         }
 
         this.addResume(resumeData);
-        await this.log.debug(`resumeTaskHandler() got new resume = ${resumeData}`);
+        await this.log.debug(`resumeTaskHandler() got new resume = ${JSON.stringify(resumeData)}`);
     }
 
     protected async taskProcessor(task:TaskFormat):Promise<void> {
