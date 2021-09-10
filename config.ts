@@ -42,7 +42,7 @@ export const proxyModule:'FineProxy'|'FineProxyRedis' = 'FineProxyRedis';
 export const fineproxy = {
     login: process.env.FINEPROXY_LOGIN || '',
     pass: process.env.FINEPROXY_PASSWORD || '',
-    updateTimer: 1000 * 60 * 60 * 6 // Через сколько обновлять прокси-лист
+    updateTimer: 1000 * 60 * 60 * 24 // Через сколько обновлять прокси-лист
 }
 
 export const redisHost = process.env.REDIS_HOST || '127.0.0.1';

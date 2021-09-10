@@ -7,7 +7,7 @@ export default class ProxyPoolFineproxyRedis extends ProxyPoolFineproxy {
 
     protected redis_key = 'proxy';
 
-    protected async cleanList():Promise<void> {
+    async cleanList():Promise<void> {
         await rcli.del(this.redis_key);
     }
 
@@ -24,6 +24,6 @@ export default class ProxyPoolFineproxyRedis extends ProxyPoolFineproxy {
     }
 
     protected async getProxyFromStorage():Promise<string> {
-        return await rcli.rpoplpush(this.redis_key, this.redis_key);
+        return await rcli.rpop(this.redis_key);
     }
 }

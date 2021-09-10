@@ -6,8 +6,6 @@ export default class ProxyPoolFineproxy implements IProxyPool
 {
     private login:string;
     private pass:string;
-    private updated = 0;
-    private updateTimer:number;
     private proxyList:string[] = [];
 
     constructor(login = fineproxy.login, pass = fineproxy.pass) {
@@ -17,23 +15,10 @@ export default class ProxyPoolFineproxy implements IProxyPool
 
         this.login = login;
         this.pass = pass;
-        this.updateTimer = fineproxy.updateTimer;
     }
 
-    protected async cleanList():Promise<void> {
+    public async cleanList():Promise<void> {
         this.proxyList = [];
-    }
-
-    private refreshUpdated():void {
-        const currentDate = new Date();
-        this.updated = currentDate.getTime();
-    }
-
-    private timeToUpdateProxyList():boolean {
-        const current = new Date();
-        const currentTimestamp = current.getTime();
-
-        return this.updated + this.updateTimer < currentTimestamp;
     }
 
     private async makeRequest():Promise<string> {
@@ -46,18 +31,17 @@ export default class ProxyPoolFineproxy implements IProxyPool
         this.proxyList.push(proxy);
     }
 
-    private async loadProxies():Promise<void> {
+    public async loadProxies():Promise<void> {
         const txtList = await this.makeRequest();
 
-        this.cleanList();
-        this.refreshUpdated();
+        await this.cleanList();
 
         const listArray = txtList.split('\n');
 
         for (const proxyRaw of listArray) {
             let proxyFormatted = proxyRaw.trim();
 
-            if (proxyFormatted.length < 7) continue;
+            if (!/(\d{1,3}\.){3}\d{1,3}/i.test(proxyFormatted)) continue;
 
             proxyFormatted = 'http://' + proxyFormatted;
 
@@ -91,7 +75,7 @@ export default class ProxyPoolFineproxy implements IProxyPool
     }
 
     async getProxy(): Promise<string> {
-        if (this.timeToUpdateProxyList() || !await this.proxyAmount()) {
+        if (await this.proxyAmount() === 0) {
             await this.loadProxies();
         }
 
