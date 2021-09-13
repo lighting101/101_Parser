@@ -51,3 +51,12 @@ export const redisPort = process.env.REDIS_PORT || '6379';
 export const redisConfig = {
     url: `redis://${redisHost}:${redisPort}`
 }
+
+type loggerModuleTypes = 'Console'|'MySQL'|'Logstash'|'MySQLConsole'|'LogElasticConsole';
+
+export const loggerModule:loggerModuleTypes = 'Logstash';
+
+export const logstashHost = process.env.LOGSTASH_HOST || '127.0.0.1';
+
+// @ts-ignore
+export const logstashPort = +process.env.LOGSTASH_PORT || 5044;

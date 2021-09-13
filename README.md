@@ -27,3 +27,9 @@ This parser runs by timer intervals and collect new resumes from job-board websi
 - **FINEPROXY_PASSWORD**
 - **REDIS_HOST** _(default: 127.0.0.1)_
 - **REDIS_PORT** _(default: 6379)_
+
+### Logger ###
+You can send logs to console, MySQL or Logstash server (over tcp, codec json)
+If you will be use logstash, you can change next settings:
+- **LOGSTASH_HOST** _(default: 127.0.0.1)_
+- **LOGSTASH_PORT** _(default: 5044)_
