@@ -247,7 +247,7 @@ describe('openSession() method', () => {
 
 describe('getResumeList()', () => {
 
-    const getCBAccount = (proxy = "http://141.98.235.125:10012",
+    const getCBAccount = (proxy = "http://1.1.1.1:10012",
                           session = "ddafb0de1ce8ccccaccce9db8fb716d8-888888888-AS-4") => {
 
         const account = new Account(<AccountBuilder> {});
@@ -443,16 +443,16 @@ describe('getResumeList()', () => {
                 Results: [
                     {
                         ResumeResultItem_V3: [
-                            { ResumeID: [ "RCM21S71GP8GHG6ZFJZ" ] },
-                            { ResumeID: [ "RD85NS6L588R28B6MRL" ] },
-                            { ResumeID: [ "RD77YZ6WHX5CPSVBMTM" ] },
-                            { ResumeID: [ "RCM48K62Q80CDHHPSW3" ] },
-                            { ResumeID: [ "RD72ZC6LR31MF69KR86" ] },
-                            { ResumeID: [ "RDH54467TMSC4TF3ZQL" ] },
-                            { ResumeID: [ "R2N0TM6TK76083X3L5F" ] },
-                            { ResumeID: [ "R2Z1JL6YB8XGVFG1KYM" ] },
-                            { ResumeID: [ "RDF5MM6MSLD3TF2D067" ] },
-                            { ResumeID: [ "RCM8HZ68FJSJS1VCW67" ] }
+                            { ResumeID: [ "RCM21S71G0000000000" ] },
+                            { ResumeID: [ "RCM21S71G0000000001" ] },
+                            { ResumeID: [ "RCM21S71G0000000002" ] },
+                            { ResumeID: [ "RCM21S71G0000000003" ] },
+                            { ResumeID: [ "RCM21S71G0000000004" ] },
+                            { ResumeID: [ "RCM21S71G0000000005" ] },
+                            { ResumeID: [ "RCM21S71G0000000006" ] },
+                            { ResumeID: [ "RCM21S71G0000000007" ] },
+                            { ResumeID: [ "RCM21S71G0000000008" ] },
+                            { ResumeID: [ "RCM21S71G0000000009" ] },
                         ]
                     }
                 ],
@@ -518,16 +518,16 @@ describe('getResumeList()', () => {
                     Results: [
                         {
                             ResumeResultItem_V3: [
-                                { ResumeID: [ "RCM21S71GP8GHG6ZFJZ" ] },
-                                { ResumeID: [ "RD85NS6L588R28B6MRL" ] },
-                                { ResumeID: [ "RD77YZ6WHX5CPSVBMTM" ] },
-                                { ResumeID: [ "RCM48K62Q80CDHHPSW3" ] },
-                                { ResumeID: [ "RD72ZC6LR31MF69KR86" ] },
-                                { ResumeID: [ "RDH54467TMSC4TF3ZQL" ] },
-                                { ResumeID: [ "R2N0TM6TK76083X3L5F" ] },
-                                { ResumeID: [ "R2Z1JL6YB8XGVFG1KYM" ] },
-                                { ResumeID: [ "RDF5MM6MSLD3TF2D067" ] },
-                                { ResumeID: [ "RCM8HZ68FJSJS1VCW67" ] }
+                                { ResumeID: [ "RCM21S71G0000000000" ] },
+                                { ResumeID: [ "RCM21S71G0000000001" ] },
+                                { ResumeID: [ "RCM21S71G0000000002" ] },
+                                { ResumeID: [ "RCM21S71G0000000003" ] },
+                                { ResumeID: [ "RCM21S71G0000000004" ] },
+                                { ResumeID: [ "RCM21S71G0000000005" ] },
+                                { ResumeID: [ "RCM21S71G0000000006" ] },
+                                { ResumeID: [ "RCM21S71G0000000007" ] },
+                                { ResumeID: [ "RCM21S71G0000000008" ] },
+                                { ResumeID: [ "RCM21S71G0000000009" ] },
                             ]
                         }
                     ],
@@ -561,16 +561,16 @@ describe('getResumeList()', () => {
                     Results: [
                         {
                             ResumeResultItem_V3: [
-                                { ResumeID: [ "RCM21S71GP8GHG6ZFJZ" ] },
-                                { ResumeID: [ "RD85NS6L588R28B6MRL" ] },
-                                { ResumeID: [ "RD77YZ6WHX5CPSVBMTM" ] },
-                                { ResumeID: [ "RCM48K62Q80CDHHPSW3" ] },
-                                { ResumeID: [ "RD72ZC6LR31MF69KR86" ] },
-                                { ResumeID: [ "RDH54467TMSC4TF3ZQL" ] },
-                                { ResumeID: [ "R2N0TM6TK76083X3L5F" ] },
-                                { ResumeID: [ "R2Z1JL6YB8XGVFG1KYM" ] },
-                                { ResumeID: [ "RDF5MM6MSLD3TF2D067" ] },
-                                { ResumeID: [ "RCM8HZ68FJSJS1VCW67" ] }
+                                { ResumeID: [ "RCM21S71G0000000000" ] },
+                                { ResumeID: [ "RCM21S71G0000000001" ] },
+                                { ResumeID: [ "RCM21S71G0000000002" ] },
+                                { ResumeID: [ "RCM21S71G0000000003" ] },
+                                { ResumeID: [ "RCM21S71G0000000004" ] },
+                                { ResumeID: [ "RCM21S71G0000000005" ] },
+                                { ResumeID: [ "RCM21S71G0000000006" ] },
+                                { ResumeID: [ "RCM21S71G0000000007" ] },
+                                { ResumeID: [ "RCM21S71G0000000008" ] },
+                                { ResumeID: [ "RCM21S71G0000000009" ] },
                             ]
                         }
                     ],
@@ -758,16 +758,16 @@ describe('getResumeList()', () => {
                         Results: [
                             {
                                 ResumeResultItem_V3: [
-                                    { ResumeID: [ "RCM21S71GP8GHG6ZFJZ" ] },
-                                    { ResumeID: [ "RD85NS6L588R28B6MRL" ] },
-                                    { ResumeID: [ "RD77YZ6WHX5CPSVBMTM" ] },
-                                    { ResumeID: [ "RCM48K62Q80CDHHPSW3" ] },
-                                    { ResumeID: [ "RD72ZC6LR31MF69KR86" ] },
-                                    { ResumeID: [ "RDH54467TMSC4TF3ZQL" ] },
-                                    { ResumeID: [ "R2N0TM6TK76083X3L5F" ] },
-                                    { ResumeID: [ "R2Z1JL6YB8XGVFG1KYM" ] },
-                                    { ResumeID: [ "RDF5MM6MSLD3TF2D067" ] },
-                                    { ResumeID: [ "RCM8HZ68FJSJS1VCW67" ] }
+                                    { ResumeID: [ "RCM21S71G0000000000" ] },
+                                    { ResumeID: [ "RCM21S71G0000000001" ] },
+                                    { ResumeID: [ "RCM21S71G0000000002" ] },
+                                    { ResumeID: [ "RCM21S71G0000000003" ] },
+                                    { ResumeID: [ "RCM21S71G0000000004" ] },
+                                    { ResumeID: [ "RCM21S71G0000000005" ] },
+                                    { ResumeID: [ "RCM21S71G0000000006" ] },
+                                    { ResumeID: [ "RCM21S71G0000000007" ] },
+                                    { ResumeID: [ "RCM21S71G0000000008" ] },
+                                    { ResumeID: [ "RCM21S71G0000000009" ] },
                                 ]
                             }
                         ],
@@ -803,16 +803,16 @@ describe('getResumeList()', () => {
                         Results: [
                             {
                                 SomeArray: [
-                                    { ResumeID: [ "RCM21S71GP8GHG6ZFJZ" ] },
-                                    { ResumeID: [ "RD85NS6L588R28B6MRL" ] },
-                                    { ResumeID: [ "RD77YZ6WHX5CPSVBMTM" ] },
-                                    { ResumeID: [ "RCM48K62Q80CDHHPSW3" ] },
-                                    { ResumeID: [ "RD72ZC6LR31MF69KR86" ] },
-                                    { ResumeID: [ "RDH54467TMSC4TF3ZQL" ] },
-                                    { ResumeID: [ "R2N0TM6TK76083X3L5F" ] },
-                                    { ResumeID: [ "R2Z1JL6YB8XGVFG1KYM" ] },
-                                    { ResumeID: [ "RDF5MM6MSLD3TF2D067" ] },
-                                    { ResumeID: [ "RCM8HZ68FJSJS1VCW67" ] }
+                                    { ResumeID: [ "RCM21S71G0000000000" ] },
+                                    { ResumeID: [ "RCM21S71G0000000001" ] },
+                                    { ResumeID: [ "RCM21S71G0000000002" ] },
+                                    { ResumeID: [ "RCM21S71G0000000003" ] },
+                                    { ResumeID: [ "RCM21S71G0000000004" ] },
+                                    { ResumeID: [ "RCM21S71G0000000005" ] },
+                                    { ResumeID: [ "RCM21S71G0000000006" ] },
+                                    { ResumeID: [ "RCM21S71G0000000007" ] },
+                                    { ResumeID: [ "RCM21S71G0000000008" ] },
+                                    { ResumeID: [ "RCM21S71G0000000009" ] },
                                 ]
                             }
                         ],
@@ -1029,8 +1029,8 @@ describe('getResume()', () => {
                         State: [ "GA" ]
                     }
                 ],
-                ContactEmail: [ "csolomon_homes@yahoo.com" ],
-                ContactName: [ "Collin Solomon" ]
+                ContactEmail: [ "collin.s@test.com" ],
+                ContactName: [ "Collin Salomoon" ]
             }));
 
             const result = await api.getResume(task, account);

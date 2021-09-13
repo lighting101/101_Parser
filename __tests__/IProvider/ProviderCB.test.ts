@@ -3,7 +3,9 @@ import Tasks from "../../lib/ResumeProviders/ProviderCB/Tasks";
 import CBAccountPoolDB from "../../lib/ResumeProviders/ProviderCB/CBAccountPoolDB";
 import LogDB from "../../lib/LogDB";
 import {JoberFormat, TaskFormat} from "../../common";
+import Redis from "../../lib/Redis";
 
+jest.mock("../../lib/Redis");
 jest.mock("../../lib/ResumeProviders/ProviderCB/Tasks");
 jest.mock("../../lib/ResumeProviders/ProviderCB/CBAccountPoolDB");
 jest.mock("../../lib/LogDB");

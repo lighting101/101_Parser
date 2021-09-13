@@ -7,7 +7,9 @@ import {JoberFormat, TaskFormat} from "../../common";
 import { generate } from "randomstring";
 import IAccount from "../../lib/ResumeProviders/ProviderCB/Interfaces/IAccount";
 import EventsDB from "../../lib/ResumeProviders/ProviderCB/EventsDB";
+import Redis from "../../lib/Redis";
 
+jest.mock("../../lib/Redis");
 jest.mock("../../lib/ResumeProviders/ProviderCB/EventsDB");
 jest.mock("../../lib/LogDB");
 jest.mock("../../lib/ResumeProviders/ProviderCB/CBAPI");
@@ -17,91 +19,8 @@ beforeEach(() => {
     jest.resetAllMocks();
 });
 
-type selectAccount = {
-    id: number,
-    login: string,
-    pass: string,
-    proxy: string|null,
-    session: string|null,
-    cac: string|null,
-    daylimit: number,
-    remainder: number
-};
-
 function genId():number {
     return Math.round( Math.random() * 3 );
-}
-
-function genLogin():string {
-    const login = generate({length: 7, charset: 'alphabetic', capitalization: 'lowercase'});
-    const domain = generate({length: 7, charset: 'alphabetic', capitalization: 'lowercase'}) + '.com';
-    return `${login}@${domain}`;
-}
-
-function genPass():string {
-    return generate(10);
-}
-
-function genProxy():string|null {
-    function genByte():number {
-        return Math.round((Math.random() * 9999) % 255);
-    }
-
-    if ( Math.random() > 0.5 ) return null;
-
-    const a1 = genByte().toString();
-    const a2 = genByte().toString();
-    const a3 = genByte().toString();
-    const a4 = genByte().toString();
-
-    return `http://${a1}.${a2}.${a3}.${a4}:1080`;
-}
-
-function genSession():string|null {
-    if (Math.random() > 0.5) return null;
-    return generate(20);
-}
-
-function genCAC():string|null {
-    if (Math.random() > 0.5) return null;
-    return 'CA' + generate({length: 5, charset: 'alphanumeric', capitalization: 'uppercase'});
-}
-
-function genDaylimit(max = 50):number {
-    if (max < 15) {
-        throw new Error('genDaylimit() minimum is 15!');
-    }
-
-    const divider = max - 10;
-
-    return Math.round((Math.random() * 8888) % divider ) + 10;
-}
-
-function genReminder(daylimit = 50):number {
-    return daylimit - Math.round( (Math.random() * 9878) % (daylimit / 2) );
-}
-
-function genDbAccount(maxDaylimit = 50):selectAccount {
-    return {
-        id: genId(),
-        login: genLogin(),
-        pass: genPass(),
-        proxy: genProxy(),
-        session: genSession(),
-        cac: genCAC(),
-        daylimit: genDaylimit(maxDaylimit),
-        remainder: genReminder(maxDaylimit)
-    };
-}
-
-function genManyDbAccounts(count = 10, maxDaylimit = 50):selectAccount[] {
-    const result:selectAccount[] = [];
-
-    for (let i = 0; i < count; i++) {
-        result.push(genDbAccount(maxDaylimit));
-    }
-
-    return result;
 }
 
 describe('getResume()', () => {

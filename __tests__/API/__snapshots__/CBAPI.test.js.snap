@@ -13,8 +13,8 @@ exports[`getResume() The method apiQuery() calling Check arguments of apiQuery()
 exports[`getResume() if success if got a good CV format 1`] = `
 Object {
   "city": "Atlanta",
-  "email": "csolomon_homes@yahoo.com",
-  "name": "Collin Solomon",
+  "email": "collin.s@test.com",
+  "name": "Collin Salomoon",
   "state": "GA",
 }
 `;
@@ -39,16 +39,16 @@ Object {
   "maxPage": 45,
   "page": 1,
   "resumes": Array [
-    "RCM21S71GP8GHG6ZFJZ",
-    "RD85NS6L588R28B6MRL",
-    "RD77YZ6WHX5CPSVBMTM",
-    "RCM48K62Q80CDHHPSW3",
-    "RD72ZC6LR31MF69KR86",
-    "RDH54467TMSC4TF3ZQL",
-    "R2N0TM6TK76083X3L5F",
-    "R2Z1JL6YB8XGVFG1KYM",
-    "RDF5MM6MSLD3TF2D067",
-    "RCM8HZ68FJSJS1VCW67",
+    "RCM21S71G0000000000",
+    "RCM21S71G0000000001",
+    "RCM21S71G0000000002",
+    "RCM21S71G0000000003",
+    "RCM21S71G0000000004",
+    "RCM21S71G0000000005",
+    "RCM21S71G0000000006",
+    "RCM21S71G0000000007",
+    "RCM21S71G0000000008",
+    "RCM21S71G0000000009",
   ],
 }
 `;
