@@ -1056,8 +1056,8 @@ describe('getResume()', () => {
                         State: [ "GA" ]
                     }
                 ],
-                ContactEmail: [ "csolomon_homes@yahoo.com" ],
-                ContactName: [ "Collin Solomon" ]
+                ContactEmail: [ "bill@msn.com" ],
+                ContactName: [ "Bill Gates" ]
             }));
 
             await api.getResume(task, account);
