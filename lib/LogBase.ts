@@ -7,7 +7,7 @@ export enum ErrorLevels {
 }
 
 export default class LogBase implements ILog {
-    private moduleName:string;
+    protected moduleName:string;
 
     constructor(moduleName = '') {
         this.moduleName = moduleName;
