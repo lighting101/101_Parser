@@ -1,63 +1,21 @@
 import Database from "./Database";
-import ILog from "./Interfaces/ILog";
+import LogBase from "./LogBase";
 
-export enum ErrorLevels {
-    debug,
-    info,
-    error
-}
+const db = new Database();
 
-type LogDBConfig = {
-    Database: ErrorLevels,
-    Console: ErrorLevels
-}
-
-const defaultConfig:LogDBConfig = {
-    Database: ErrorLevels.debug,
-    Console: ErrorLevels.debug
-}
-
-export default class LogDB implements ILog {
-    private config:LogDBConfig;
-    private db:Database;
-    private moduleName:string;
+export default class LogDB extends LogBase{
     protected errorLevelText = ['debug', 'info', 'error'];
-
-    constructor(moduleName = '', config:LogDBConfig = defaultConfig) {
-        this.db = new Database();
-        this.config = config;
-        this.moduleName = moduleName;
-    }
-
-    async info(msg: string): Promise<void> {
-        const level = ErrorLevels.info;
-        await this.drawMessage(msg, level);
-    }
-
-    async debug(msg: string): Promise<void> {
-        const level = ErrorLevels.debug;
-        await this.drawMessage(msg, level);
-    }
-
-    async error(msg: string): Promise<void> {
-        const level = ErrorLevels.error
-        await this.drawMessage(msg, level);
-    }
 
     protected level2Text(level:number):string {
         return this.errorLevelText[level];
     }
 
-    private async drawMessage(message:string, level:number) {
-        const fullMessage = `${this.moduleName} -> ${message}`;
+    protected async drawMessage(message:string, level:number):Promise<string> {
+        const formatMessage = await super.drawMessage(message, level);
 
-        if (level >= this.config.Console) {
-            console.log(fullMessage);
-        }
+        const sql = 'insert into `log` set ?'
+        await db.query(sql, [{ message: formatMessage, level: this.level2Text(level) }])
 
-        if (level >= this.config.Database) {
-            const sql = 'insert into `log` set ?'
-            await this.db.query(sql, [{ message: fullMessage, level: this.level2Text(level) }])
-        }
+        return formatMessage;
     }
 }
