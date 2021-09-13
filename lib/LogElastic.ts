@@ -9,6 +9,15 @@ type messageFormat = {
 
 export default class LogElastic extends LogBase{
     protected errorLevelText = ['DEBUG', 'INFO', 'ERROR'];
+    private logstashHost:string;
+    private logstashPort:number;
+
+    constructor(moduleName:string, logstashHost:string, logstashPort: number) {
+        super(moduleName);
+
+        this.logstashHost = logstashHost;
+        this.logstashPort = logstashPort;
+    }
 
     protected level2Text(level:number):string {
         return this.errorLevelText[level];
@@ -37,8 +46,8 @@ export default class LogElastic extends LogBase{
 
     private async sendToLogstash(message:messageFormat):Promise<void> {
         await this.tcpSend(JSON.stringify(message), {
-            host: '127.0.0.1',
-            port: 5044
+            host: this.logstashHost,
+            port: this.logstashPort
         });
     }
 
