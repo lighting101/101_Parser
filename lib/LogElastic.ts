@@ -1,5 +1,5 @@
 import LogBase from "./LogBase";
-import {createConnection} from "net";
+import fetch from 'node-fetch';
 
 type messageFormat = {
     level:string,
@@ -9,45 +9,25 @@ type messageFormat = {
 
 export default class LogElastic extends LogBase{
     protected errorLevelText = ['DEBUG', 'INFO', 'ERROR'];
-    private logstashHost:string;
-    private logstashPort:number;
+    private logstashUrl:string;
 
-    constructor(moduleName:string, logstashHost:string, logstashPort: number) {
+    constructor(moduleName:string, logstashUrl:string) {
         super(moduleName);
 
-        this.logstashHost = logstashHost;
-        this.logstashPort = logstashPort;
+        this.logstashUrl = logstashUrl;
     }
 
     protected level2Text(level:number):string {
         return this.errorLevelText[level];
     }
 
-    private tcpSend(message: string, options:{host:string, port:number}):Promise<void> {
-        return new Promise(((resolve, reject) => {
-            const sock = createConnection(options);
-
-            sock.on('connect', async () => {
-                sock.write(message, err => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        sock.destroy();
-                        resolve();
-                    }
-                });
-            })
-
-            sock.on('error', e => {
-                reject(e);
-            })
-        }));
-    }
-
     private async sendToLogstash(message:messageFormat):Promise<void> {
-        await this.tcpSend(JSON.stringify(message), {
-            host: this.logstashHost,
-            port: this.logstashPort
+        await fetch(this.logstashUrl, {
+            method: 'POST',
+            body: JSON.stringify(message),
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
     }
 

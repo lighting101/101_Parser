@@ -29,7 +29,12 @@ This parser runs by timer intervals and collect new resumes from job-board websi
 - **REDIS_PORT** _(default: 6379)_
 
 ### Logger ###
-You can send logs to console, MySQL or Logstash server (over tcp, codec json)
+You can send logs to console, MySQL or Logstash server (over http/https, codec json)
 If you will be use logstash, you can change next settings:
-- **LOGSTASH_HOST** _(default: 127.0.0.1)_
-- **LOGSTASH_PORT** _(default: 5044)_
+- **LOGSTASH_URL** _(default: https://127.0.0.1:1080)_
+- **LOGGER_MODULE** one of the below:
+  - **Console** - logs to console
+  - **MySQL** - to mysql DB
+  - **Logstash** - to logstash over HTTP(S) POST JSON
+  - **MySQLConsole** - to MySQL and Console
+  - **LogElasticConsole** - to Logstash and Console

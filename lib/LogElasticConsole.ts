@@ -7,9 +7,9 @@ export default class LogElasticConsole implements ILog
     private logConsole:LogConsole;
     private logElastic:LogElastic;
 
-    constructor(moduleName: string, logstashHost: string, logstashPort: number) {
+    constructor(moduleName: string, logstashURL: string) {
         this.logConsole = new LogConsole(moduleName);
-        this.logElastic = new LogElastic(moduleName, logstashHost, logstashPort);
+        this.logElastic = new LogElastic(moduleName, logstashURL);
     }
 
     async debug(msg: string): Promise<void> {

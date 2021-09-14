@@ -54,9 +54,7 @@ export const redisConfig = {
 
 type loggerModuleTypes = 'Console'|'MySQL'|'Logstash'|'MySQLConsole'|'LogElasticConsole';
 
-export const loggerModule:loggerModuleTypes = 'Logstash';
-
-export const logstashHost = process.env.LOGSTASH_HOST || '127.0.0.1';
-
 // @ts-ignore
-export const logstashPort = +process.env.LOGSTASH_PORT || 5044;
+export const loggerModule:loggerModuleTypes = process.env.LOGGER_MODULE || 'LogElasticConsole';
+
+export const logstashURL = process.env.LOGSTASH_URL || 'https://127.0.0.1:1080';
