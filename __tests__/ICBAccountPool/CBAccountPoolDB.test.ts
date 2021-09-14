@@ -8,7 +8,12 @@ import { generate } from "randomstring";
 import IAccount from "../../lib/ResumeProviders/ProviderCB/Interfaces/IAccount";
 import EventsDB from "../../lib/ResumeProviders/ProviderCB/EventsDB";
 import Redis from "../../lib/Redis";
+import ILog from "../../lib/Interfaces/ILog";
+import LogConsole from "../../lib/LogConsole";
 
+const LogFactory = jest.fn(() => new LogConsole('test'));
+
+jest.mock("../../lib/LogConsole");
 jest.mock("../../lib/Redis");
 jest.mock("../../lib/ResumeProviders/ProviderCB/EventsDB");
 jest.mock("../../lib/LogDB");
@@ -23,11 +28,19 @@ function genId():number {
     return Math.round( Math.random() * 3 );
 }
 
+function AccPoolFactory():CBAccountPoolDB {
+    const logProvider = new LogConsole('test');
+    const CBAPIProvider = new CBAPI();
+    const events = new EventsDB();
+
+    return new CBAccountPoolDB(logProvider, CBAPIProvider, events);
+}
+
 describe('getResume()', () => {
     it('Good result, must be match to test object', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
         const account = new Account(<AccountBuilder> {});
         const task:TaskFormat = {
             data: {
@@ -57,7 +70,7 @@ describe('getResume()', () => {
         it('...has 2 arguments', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
             const task:TaskFormat = {
                 data: {
@@ -82,7 +95,7 @@ describe('getResume()', () => {
         it('...the argument two is a Task', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
             const task:TaskFormat = {
                 data: {
@@ -107,7 +120,7 @@ describe('getResume()', () => {
         it('...the argument two is an Account', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
             const task:TaskFormat = {
                 data: {
@@ -134,7 +147,7 @@ describe('getResume()', () => {
         it('Throwing specific error if not enough accounts', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
 
             const errorMsg = 'Accounts list is empty'
             pool.getAccount = jest.fn(() => Promise.reject(new Error(errorMsg)));
@@ -152,7 +165,7 @@ describe('getResume()', () => {
         it('Catch an undefined error from CBAPI.getResume()', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
             const task:TaskFormat = {
                 data: {
@@ -186,7 +199,7 @@ describe('getResumeList()', () => {
     it('Good result, must be match to test object', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
         const account = new Account(<AccountBuilder> {});
         const task:TaskFormat = {
             data: {
@@ -231,7 +244,7 @@ describe('getResumeList()', () => {
         it('...has 2 arguments', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
             const task:TaskFormat = {
                 data: {
@@ -261,7 +274,7 @@ describe('getResumeList()', () => {
         it('...argument one is a Task', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
             const task:TaskFormat = {
                 data: {
@@ -291,7 +304,7 @@ describe('getResumeList()', () => {
         it('...argument two is an Account', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
             const task:TaskFormat = {
                 data: {
@@ -323,7 +336,7 @@ describe('getResumeList()', () => {
         it('Throwing specific error if not enough accounts', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
 
             const errorMsg = 'Accounts list is empty'
             pool.getAccount = jest.fn(() => Promise.reject(new Error(errorMsg)));
@@ -341,7 +354,7 @@ describe('getResumeList()', () => {
         it('Catch an undefined error from CBAPI.getResume()', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
             const task:TaskFormat = {
                 data: {
@@ -380,7 +393,7 @@ describe('removeAccount()', () => {
     it('accounts[] must be not contain removed account', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
 
         const accountsLength = 30;
 
@@ -405,7 +418,7 @@ describe('removeAccount()', () => {
     it('accounts[] must be decreased by 1', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
 
         const accountsLength = 30;
 
@@ -432,7 +445,7 @@ describe('saveAccounts()', () => {
     it('Amount of the queries must be equals amount of the accounts', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
 
         const accountsLength = 30;
 
@@ -457,7 +470,7 @@ describe('saveAccount()', () => {
     it('SQL query must be contains account\'s data', async () => {
         expect.assertions(4);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
         const account = new Account(<AccountBuilder>{});
 
         const cac = generate(7);
@@ -494,7 +507,7 @@ describe('errorHandler()', () => {
     it('Unhandled error must throwing up the exception', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
         const account = new Account(<AccountBuilder> {});
 
         const someError = new Error('Unhandled exception');
@@ -522,7 +535,7 @@ describe('errorHandler()', () => {
     it('The unhandled error & the inactive account are calling removeInactiveAccount()', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
         const account = new Account(<AccountBuilder> {});
 
         const someError = new Error('Unhandled exception');
@@ -551,7 +564,7 @@ describe('errorHandler()', () => {
         it('The exception handling and isn\'t throwing up', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
 
             const errIncorrectPassword = new Error('{"Code":["300"],"Text":["300|Email test@mail.com and/or Password could not be validated."]}');
@@ -579,7 +592,7 @@ describe('errorHandler()', () => {
         it('Must be run the recursive callback', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
 
             const errIncorrectPassword = new Error('{"Code":["300"],"Text":["300|Email test@mail.com and/or Password could not be validated."]}');
@@ -607,7 +620,7 @@ describe('errorHandler()', () => {
         it('Must be run the passwordInvalid() method', async () => {
             expect.assertions(1);
 
-            const pool = new CBAccountPoolDB();
+            const pool = AccPoolFactory();
             const account = new Account(<AccountBuilder> {});
 
             const errIncorrectPassword = new Error('{"Code":["300"],"Text":["300|Email test@mail.com and/or Password could not be validated."]}');
@@ -639,7 +652,7 @@ describe('setDisableAccount()', () => {
         expect.assertions(1);
 
         const account = new Account(<AccountBuilder> {});
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
 
         account.getID = jest.fn().mockReturnValue(123);
 
@@ -658,7 +671,7 @@ describe('getAccount()', () => {
     it('Throwing a specific exception if accounts pool is empty', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
 
         try {
             await pool.getAccount();
@@ -674,7 +687,7 @@ describe('getAccount()', () => {
 
         setTimeout(() => canAccountProcess.status = true, 3000);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
 
         const account = new Account(<AccountBuilder>{});
 
@@ -694,7 +707,7 @@ describe('getAccount()', () => {
     it('Got an account from the pool', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
         const account = new Account(<AccountBuilder>{});
 
         account.canProcess = jest.fn().mockReturnValue(true);
@@ -713,7 +726,7 @@ describe('getAccount()', () => {
     it('Calling the moveAccToEnd() method', async () => {
         expect.assertions(1);
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
         const account = new Account(<AccountBuilder>{});
         account.canProcess = jest.fn().mockReturnValue(true);
 
@@ -742,7 +755,7 @@ describe('moveAccToEnd()', () => {
         // @ts-ignore
         const account3 = <Account> {key: 'account 3'};
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
 
         // @ts-ignore
         const accounts = pool.accounts = [ account1, account2, account3 ];
@@ -765,7 +778,7 @@ describe('moveAccToEnd()', () => {
         // @ts-ignore
         const account3 = <Account> {key: 'account 3'};
 
-        const pool = new CBAccountPoolDB();
+        const pool = AccPoolFactory();
 
         // @ts-ignore
         const accounts = pool.accounts = [ account1, account2, account3 ];
