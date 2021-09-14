@@ -1,8 +1,8 @@
 import LogConsole from "./LogConsole";
 import LogDB from "./LogDB";
 import LogElastic from "./LogElastic";
-import ILog from "./Interfaces/ILog";
-import {loggerModule, logstashURL} from "../config";
+import ILog from "../Interfaces/ILog";
+import {loggerModule, logstashURL} from "../../config";
 import LogElasticConsole from "./LogElasticConsole";
 import LogDBConsole from "./LogDBConsole";
 

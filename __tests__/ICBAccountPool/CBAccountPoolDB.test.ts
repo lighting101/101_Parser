@@ -1,5 +1,5 @@
 import CBAccountPoolDB from "../../lib/ResumeProviders/ProviderCB/CBAccountPoolDB";
-import LogDB from "../../lib/LogDB";
+import LogDB from "../../lib/Logger/LogDB";
 import CBAPI from "../../lib/ResumeProviders/ProviderCB/CBAPI";
 import Account from "../../lib/ResumeProviders/ProviderCB/Account";
 import AccountBuilder from "../../lib/ResumeProviders/ProviderCB/AccountBuilder";
@@ -9,14 +9,14 @@ import IAccount from "../../lib/ResumeProviders/ProviderCB/Interfaces/IAccount";
 import EventsDB from "../../lib/ResumeProviders/ProviderCB/EventsDB";
 import Redis from "../../lib/Redis";
 import ILog from "../../lib/Interfaces/ILog";
-import LogConsole from "../../lib/LogConsole";
+import LogConsole from "../../lib/Logger/LogConsole";
 
 const LogFactory = jest.fn(() => new LogConsole('test'));
 
-jest.mock("../../lib/LogConsole");
+jest.mock("../../lib/Logger/LogConsole");
 jest.mock("../../lib/Redis");
 jest.mock("../../lib/ResumeProviders/ProviderCB/EventsDB");
-jest.mock("../../lib/LogDB");
+jest.mock("../../lib/Logger/LogDB");
 jest.mock("../../lib/ResumeProviders/ProviderCB/CBAPI");
 jest.mock("../../lib/ResumeProviders/ProviderCB/Account");
 

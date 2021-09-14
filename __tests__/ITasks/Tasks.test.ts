@@ -1,10 +1,10 @@
 import Tasks from "../../lib/ResumeProviders/ProviderCB/Tasks";
 import TasksStorageDB from "../../lib/ResumeProviders/ProviderCB/TasksStorageDB";
-import LogDB from "../../lib/LogDB";
+import LogDB from "../../lib/Logger/LogDB";
 import mock = jest.mock;
 
 jest.mock("../../lib/ResumeProviders/ProviderCB/TasksStorageDB")
-jest.mock("../../lib/LogDB")
+jest.mock("../../lib/Logger/LogDB")
 
 beforeEach(() => {
     jest.clearAllMocks();

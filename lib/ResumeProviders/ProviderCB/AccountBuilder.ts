@@ -5,7 +5,7 @@ import ILog from "../../Interfaces/ILog";
 import CBAPI from "./CBAPI";
 import {maxTimeLimitForAccount} from "../../../config";
 import ProxyPoolFactory from "../../ProxyPoolFactory";
-import LogFactory from "../../LogFactory";
+import LogFactory from "../../Logger/LogFactory";
 
 export default class AccountBuilder
 {

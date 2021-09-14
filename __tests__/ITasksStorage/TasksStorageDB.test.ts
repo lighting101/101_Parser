@@ -1,8 +1,8 @@
 import TasksStorageDB from "../../lib/ResumeProviders/ProviderCB/TasksStorageDB";
-import LogDB from "../../lib/LogDB";
+import LogDB from "../../lib/Logger/LogDB";
 import Database from "../../lib/Database";
 
-jest.mock("../../lib/LogDB");
+jest.mock("../../lib/Logger/LogDB");
 jest.mock("../../lib/Database");
 
 beforeEach(() => {

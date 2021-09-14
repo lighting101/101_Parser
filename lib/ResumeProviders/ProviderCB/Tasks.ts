@@ -9,7 +9,7 @@ import ITasks from "./Interfaces/ITasks";
 import * as fs from "fs";
 import {FRESHNESS, ROWS_PER_PAGE} from "../../../config";
 import ILog from "../../Interfaces/ILog";
-import LogFactory from "../../LogFactory";
+import LogFactory from "../../Logger/LogFactory";
 
 export default class Tasks implements ITasks {
     private storage:ITasksStorage;

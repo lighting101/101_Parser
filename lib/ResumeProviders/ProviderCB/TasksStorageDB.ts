@@ -4,7 +4,7 @@ import {TASKS_LIMIT, maxHoursTaskCanProcessing} from "../../../config";
 import ITasksStorage from "./Interfaces/ITaskStorage";
 import {TaskType} from "../../../common";
 import ILog from "../../Interfaces/ILog";
-import LogFactory from "../../LogFactory";
+import LogFactory from "../../Logger/LogFactory";
 
 type TasksDB = {
     id: number,

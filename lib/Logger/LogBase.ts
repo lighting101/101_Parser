@@ -1,4 +1,4 @@
-import ILog from "./Interfaces/ILog";
+import ILog from "../Interfaces/ILog";
 
 export enum ErrorLevels {
     debug,

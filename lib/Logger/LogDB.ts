@@ -1,4 +1,4 @@
-import Database from "./Database";
+import Database from "../Database";
 import LogBase from "./LogBase";
 
 const db = new Database();

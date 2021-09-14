@@ -6,7 +6,7 @@ import CBAccountPoolDB from "./ProviderCB/CBAccountPoolDB";
 import ICBAccountPool from "./ProviderCB/Interfaces/ICBAccountPool";
 import ILog from "../Interfaces/ILog";
 import {FetchError} from "node-fetch";
-import LogFactory from "../LogFactory";
+import LogFactory from "../Logger/LogFactory";
 
 export default class ProviderCB implements IProvider
 {

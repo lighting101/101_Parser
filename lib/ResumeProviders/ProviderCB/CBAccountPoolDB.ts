@@ -8,7 +8,7 @@ import CBAPI from "./CBAPI";
 import ICBAPI from "./Interfaces/ICBAPI";
 import EventsDB from "./EventsDB";
 import Account from "./Account";
-import LogFactory from "../../LogFactory";
+import LogFactory from "../../Logger/LogFactory";
 
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve => setTimeout(() => resolve(), ms)));
