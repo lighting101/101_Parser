@@ -3,8 +3,8 @@ import Database from "../../Database";
 import {TASKS_LIMIT, maxHoursTaskCanProcessing} from "../../../config";
 import ITasksStorage from "./Interfaces/ITaskStorage";
 import {TaskType} from "../../../common";
-import LogDB from "../../LogDB";
 import ILog from "../../Interfaces/ILog";
+import LogFactory from "../../LogFactory";
 
 type TasksDB = {
     id: number,
@@ -18,7 +18,7 @@ export default class TasksStorageDB implements ITasksStorage
     private log:ILog;
     private db:Database;
 
-    constructor(logProvider = new LogDB('TaskStorageDB'),
+    constructor(logProvider = LogFactory('TaskStorageDB'),
                 oDB = new Database()) {
 
         this.log = logProvider;

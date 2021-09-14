@@ -1,12 +1,12 @@
 import IProvider from "./Interfaces/IProvider"
 import {JoberFormat, TaskFormat} from "../../common"
-import Log from "../LogDB"
 import Tasks from "./ProviderCB/Tasks"
 import ITasks from "./ProviderCB/Interfaces/ITasks";
 import CBAccountPoolDB from "./ProviderCB/CBAccountPoolDB";
 import ICBAccountPool from "./ProviderCB/Interfaces/ICBAccountPool";
 import ILog from "../Interfaces/ILog";
 import {FetchError} from "node-fetch";
+import LogFactory from "../LogFactory";
 
 export default class ProviderCB implements IProvider
 {
@@ -18,7 +18,7 @@ export default class ProviderCB implements IProvider
 
     constructor(taskProvider:ITasks = new Tasks(),
                 accountPool:ICBAccountPool = new CBAccountPoolDB(),
-                log = new Log('ProviderCB')) {
+                log = LogFactory('ProviderCB')) {
 
         this.tasks = taskProvider;
         this.accountPool = accountPool;

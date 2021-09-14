@@ -3,9 +3,9 @@ import ICBAPI from "./Interfaces/ICBAPI";
 import IProxyPool from "../../Interfaces/IProxyPool";
 import ILog from "../../Interfaces/ILog";
 import CBAPI from "./CBAPI";
-import LogDB from "../../LogDB";
 import {maxTimeLimitForAccount} from "../../../config";
 import ProxyPoolFactory from "../../ProxyPoolFactory";
+import LogFactory from "../../LogFactory";
 
 export default class AccountBuilder
 {
@@ -91,7 +91,7 @@ export default class AccountBuilder
         }
 
         if (typeof this.LogProvider === 'undefined') {
-            this.LogProvider = new LogDB(`Account[${this.login}]`);
+            this.LogProvider = LogFactory(`Account[${this.login}]`);
         }
     }
 

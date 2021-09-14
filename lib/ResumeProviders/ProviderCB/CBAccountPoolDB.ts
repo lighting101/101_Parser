@@ -1,6 +1,5 @@
 import ICBAccountPool from "./Interfaces/ICBAccountPool";
 import Database from "../../Database";
-import LogDB from "../../LogDB";
 import ILog from "../../Interfaces/ILog";
 import {DEFAULT_PARSE_LIMIT} from "../../../config";
 import AccountBuilder from "./AccountBuilder";
@@ -9,6 +8,7 @@ import CBAPI from "./CBAPI";
 import ICBAPI from "./Interfaces/ICBAPI";
 import EventsDB from "./EventsDB";
 import Account from "./Account";
+import LogFactory from "../../LogFactory";
 
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve => setTimeout(() => resolve(), ms)));
@@ -21,7 +21,7 @@ export default class CBAccountPoolDB implements ICBAccountPool {
     private CBAPI:ICBAPI;
     private events:EventsDB;
 
-    constructor(logProvider: ILog = new LogDB('CBAccountPool'),
+    constructor(logProvider: ILog = LogFactory('CBAccountPool'),
                 CBAPIProvider:ICBAPI = new CBAPI(),
                 events = new EventsDB()) {
 

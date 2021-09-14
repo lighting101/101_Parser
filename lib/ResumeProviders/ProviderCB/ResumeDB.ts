@@ -2,9 +2,9 @@ import IResume from "./Interfaces/IResume";
 import Database from "../../Database";
 import {JoberFormat} from "../../../common";
 import ILog from "../../Interfaces/ILog";
-import LogDB from "../../LogDB";
+import LogFactory from "../../LogFactory";
 
-const log:ILog = new LogDB('ResumeDB');
+const log:ILog = LogFactory('ResumeDB');
 
 const db = new Database();
 
