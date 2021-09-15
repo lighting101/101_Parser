@@ -43,7 +43,7 @@ export default class ProxyPoolFineproxy implements IProxyPool
 
             if (!/(\d{1,3}\.){3}\d{1,3}/i.test(proxyFormatted)) continue;
 
-            proxyFormatted = 'http://' + proxyFormatted;
+            proxyFormatted = 'http://' + proxyFormatted.trim();
 
             await this.addProxyToList(proxyFormatted);
         }
