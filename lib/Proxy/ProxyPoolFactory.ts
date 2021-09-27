@@ -1,11 +1,28 @@
-import {proxyModule} from "../../config";
+import {proxyLink, proxyModule, proxyStorage} from "../../config";
 import ProxyPoolFineproxy from "./ProxyPoolFineproxy";
-import ProxyPoolFineproxyRedis from "./ProxyPoolFineproxyRedis";
 import IProxyPool from "../Interfaces/IProxyPool";
+import StorageMemory from "./ProxyStorage/StorageMemory";
+import StorageRedis from "./ProxyStorage/StorageRedis";
+import ProxyPoolLink from "./ProxyPoolLink";
 
-export default function ProxyPoolFactory(login?:string, pass?:string):IProxyPool {
+export default function ProxyPoolFactory():IProxyPool {
+
+    let storage:IProxyStorage;
+
+    switch (proxyStorage) {
+        case "Memory":
+            storage = new StorageMemory();
+            break;
+
+        case "Redis":
+            storage = new StorageRedis();
+            break;
+    }
+
     switch (proxyModule) {
-        case "FineProxy": return new ProxyPoolFineproxy(login, pass);
-        case "FineProxyRedis": return new ProxyPoolFineproxyRedis(login, pass);
+        case "Fineproxy":
+            return new ProxyPoolFineproxy(storage);
+        case "Link":
+            return new ProxyPoolLink(storage, proxyLink);
     }
 }
