@@ -1,49 +1,35 @@
-import ProviderCB from "./lib/ResumeProviders/ProviderCB";
-import IProvider from "./lib/ResumeProviders/Interfaces/IProvider";
-import ResumeDB from "./lib/ResumeProviders/ProviderCB/ResumeDB";
-import IResume from "./lib/ResumeProviders/ProviderCB/Interfaces/IResume";
-import LogDB from "./lib/LogDB";
-import ILog from "./lib/Interfaces/ILog";
+import LogFactory from "./lib/Logger/LogFactory";
+import { Worker } from "worker_threads";
 
-const resumeDB:IResume = new ResumeDB();
-const log:ILog = new LogDB('MAIN');
+const log = LogFactory('MAIN');
 
-const parsers:IProvider[] = []
+function runService():Promise<void> {
+    return new Promise((resolve, reject) => {
+        const worker = new Worker('./lib/ResumeProviders/CBChild.js', );
+        worker.on('message', resolve);
+        worker.on('error', reject);
+        worker.on('exit', (code) => {
+            if (code !== 0)
+                reject(new Error(`Worker stopped with exit code ${code}`));
+        })
+    })
+}
 
-parsers.push(new ProviderCB())
+let processing = false;
 
-const promises:Promise<void>[] = parsers.map(async parser => {
-    const parserName = parser.getName();
-    await log.debug(`parser[${parserName}].beforeWork() start`);
-    await parser.beforeWork();
-    await log.debug(`parser[${parserName}].beforeWork() finish`);
+setInterval(async () => {
+    if (processing) return;
+    processing = true;
+
+    await log.info('New loop started');
+
     try {
-        await log.debug(`parser[${parserName}].go() start`);
-        await parser.go();
-        await log.debug(`parser[${parserName}].go() finish`);
+        await runService();
     } catch (e) {
-        await log.error(`parser[${parserName}] caught error ${e.name}: ${e.message}`);
-    } finally {
-        await log.debug(`parser[${parserName}].afterWork() start`);
-
-        const resumes = parser.getResumes();
-        await log.debug(`parser[${parserName}].afterWork() finally found ${resumes.length} resumes`);
-        await resumeDB.saveMany(resumes);
-
-        await parser.afterWork();
-
-        await log.debug(`parser[${parserName}].afterWork() finish`);
-    }
-})
-
-Promise.all(promises)
-    .then(async () => {
-        await log.info('runParser() The task queue was executed with no errors');
-    })
-    .catch( async e => {
         await log.error(`Parsers were stopped by error: ${e.message}`);
-    })
-    .finally(async () => {
-        await log.info(`runParser() The task queue been done`);
-        process.exit(0);
-    })
+    } finally {
+        await log.info(`Loop finished`);
+        processing = false;
+    }
+}, 5000)
+
