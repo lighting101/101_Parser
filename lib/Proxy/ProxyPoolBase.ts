@@ -1,5 +1,5 @@
-import IProxyPool from "./Interfaces/IProxyPool";
-import {fineproxy} from "../config";
+import IProxyPool from "../Interfaces/IProxyPool";
+import {fineproxy} from "../../config";
 import fetch from "node-fetch";
 
 export default class ProxyPoolFineproxy implements IProxyPool

@@ -1,7 +1,7 @@
-import {proxyModule} from "../config";
+import {proxyModule} from "../../config";
 import ProxyPoolFineproxy from "./ProxyPoolFineproxy";
 import ProxyPoolFineproxyRedis from "./ProxyPoolFineproxyRedis";
-import IProxyPool from "./Interfaces/IProxyPool";
+import IProxyPool from "../Interfaces/IProxyPool";
 
 export default function ProxyPoolFactory(login?:string, pass?:string):IProxyPool {
     switch (proxyModule) {

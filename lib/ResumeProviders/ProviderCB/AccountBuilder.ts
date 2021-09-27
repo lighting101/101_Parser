@@ -4,7 +4,7 @@ import IProxyPool from "../../Interfaces/IProxyPool";
 import ILog from "../../Interfaces/ILog";
 import CBAPI from "./CBAPI";
 import {maxTimeLimitForAccount} from "../../../config";
-import ProxyPoolFactory from "../../ProxyPoolFactory";
+import ProxyPoolFactory from "../../Proxy/ProxyPoolFactory";
 import LogFactory from "../../Logger/LogFactory";
 
 export default class AccountBuilder

@@ -1,5 +1,5 @@
 import ProxyPoolFineproxy from "./ProxyPoolFineproxy";
-import Redis from "./Redis";
+import Redis from "../Redis";
 
 const rcli = new Redis();
 
